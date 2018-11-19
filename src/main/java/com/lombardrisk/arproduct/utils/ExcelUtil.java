@@ -1203,7 +1203,7 @@ public class ExcelUtil {
 		String displayValue=null;
 		if(cell==null){return null;}
 		DataFormatter formatter=new DataFormatter(); 
-		CellType type=cell.getCellType();
+		//CellType type=(CellType) Helper.callMethodBy("poi-4.0.0.jar", "org.apache.poi.ss.usermodel.Cell", "getCellType", null, null);
 		if(cell.getCellType().equals(CellType.NUMERIC)){
 	    	if (DateUtil.isCellDateFormatted(cell))
 			{

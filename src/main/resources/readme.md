@@ -33,6 +33,7 @@ quick get started
 * check "export to excel" solo
     `mvn test -Dfunc="excel" -Ddownload="c:\foo\download.xlsx" -Dexpectation="c:\foo\exptected.xlsx" -DlogPath="c:\foo\logs"`
 * check "export to excel" batch
+    `mvn exec:java -Dexec.mainClass="com.lombardrisk.arproduct.arfilechecker.Checker" -Dfunc="val" -DallInOne="Z:\ProductLine\FED\TestResults\FED_1.14.2\Auto\1.14.2_AR1.16.0b75\scenarios-result\part2test.xlsx" -Dsheet="Val"`
     `mvn test -Dfunc="val" -Ddownload="c:\foo\download.xlsx" -Dexpectation="c:\foo\exptected.xlsx" -DlogPath="c:\foo\logs"`
 * check "validation rules" solo
     `mvn test -Dfunc="excel" -Ddownload="c:\foo\download.xlsx" -Dexpectation="c:\foo\exptected.xlsx"

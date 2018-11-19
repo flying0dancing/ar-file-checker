@@ -1,12 +1,16 @@
 package com.lombardrisk.arproduct.utils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.List;
@@ -56,6 +60,41 @@ public class Helper {
     	}
     	return null;
     }
+    
+
+	@SuppressWarnings("rawtypes")
+	protected static Object callMethodBy(String jarName,String className,String methodName,  Class[] parameterTypes,Object[] args){
+    	try {
+    		ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+    		Thread.currentThread().setContextClassLoader(Helper.class.getClassLoader());
+			ClassLoader loader1=new URLClassLoader(new URL[]{new URL("file",null,"E:/MavenRepository/org/apache/poi/poi/4.0.0/"+jarName)});
+			Class<?> claz1=Class.forName(className,true,loader1);
+			Object instance=claz1.newInstance();
+			Method mthod1=claz1.getMethod(methodName, parameterTypes);
+			Object result=mthod1.invoke(instance, args);
+			Thread.currentThread().setContextClassLoader(oldClassLoader);
+			return result;
+		} catch (MalformedURLException e) {
+			logger.error(e.getMessage(),e);
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage(),e);
+		} catch (InstantiationException e) {
+			logger.error(e.getMessage(),e);
+		} catch (IllegalAccessException e) {
+			logger.error(e.getMessage(),e);
+		} catch (NoSuchMethodException e) {
+			logger.error(e.getMessage(),e);
+		} catch (SecurityException e) {
+			logger.error(e.getMessage(),e);
+		} catch (IllegalArgumentException e) {
+			logger.error(e.getMessage(),e);
+		} catch (InvocationTargetException e) {
+			logger.error(e.getMessage(),e);
+		}
+    	
+    	return null;
+    }
+    
     
     public static String convertBlobToStr(Blob blob)
     {
