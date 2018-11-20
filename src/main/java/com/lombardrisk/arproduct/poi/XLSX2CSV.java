@@ -20,14 +20,11 @@ import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.extractor.XSSFEventBasedExcelExtractor;
-import org.apache.poi.xssf.model.SharedStrings;
-import org.apache.poi.xssf.model.Styles;
 import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 import org.slf4j.Logger;
@@ -66,7 +63,7 @@ public class XLSX2CSV {
      *  of parsing the Sheet XML, and outputs the contents
      *  as a (basic) CSV.
      */
-    private class SheetToCSV implements SheetContentsHandler {
+   /* private class SheetToCSV implements SheetContentsHandler {
         private boolean firstCellOfRow;
         private int currentRow = -1;
         private int currentCol = -1;
@@ -131,16 +128,7 @@ public class XLSX2CSV {
             }
             currentCol = thisCol;
             
-            // Number or string?
-          /*  try {
-                //noinspection ResultOfMethodCallIgnored
-                Double.parseDouble(formattedValue);
-                output.append(formattedValue);
-            } catch (NumberFormatException e) {
-                output.append('"');
-                output.append(formattedValue);
-                output.append('"');
-            }*/
+          
             row.add(formattedValue);
         }
     }
@@ -150,26 +138,16 @@ public class XLSX2CSV {
 
     private final OPCPackage xlsxPackage;
 
-    /**
-     * Number of columns to read starting with leftmost
-     */
+   
     private final int minColumns;
 
-    /**
-     * Destination for data
-     */
+   
     private final PrintStream output;
     
     //private final List<List<String>> content;
     private final Map<String,List<List<String>>> allContent;
 
-    /**
-     * Creates a new XLSX -> CSV examples
-     *
-     * @param pkg        The XLSX package to process
-     * @param output     The PrintStream to output the CSV to
-     * @param minColumns The minimum number of columns to output, or -1 for no minimum
-     */
+   
     public XLSX2CSV(OPCPackage pkg, PrintStream output,Map<String,List<List<String>>> allContent, int minColumns) {
         this.xlsxPackage = pkg;
         this.output = output;
@@ -177,19 +155,7 @@ public class XLSX2CSV {
         this.allContent=allContent;
     }
 
-    /**
-     * Parses and shows the content of one sheet
-     * using the specified styles and shared-strings tables.
-     *
-     * @param styles The table of styles that may be referenced by cells in the sheet
-     * @param strings The table of strings that may be referenced by cells in the sheet
-     * @param sheetInputStream The stream to read the sheet-data from.
-
-     * @exception java.io.IOException An IO exception from the parser,
-     *            possibly from a byte stream or character stream
-     *            supplied by the application.
-     * @throws SAXException if parsing the XML data fails.
-     */
+   
     public void processSheet(Styles styles, SharedStrings strings,  SheetContentsHandler sheetHandler,  InputStream sheetInputStream) throws IOException, SAXException {
         DataFormatter formatter = new DataFormatter();
         InputSource sheetSource = new InputSource(sheetInputStream);
@@ -204,12 +170,7 @@ public class XLSX2CSV {
          }
     }
 
-    /**
-     * Initiates the processing of the XLS workbook file to CSV.
-     *
-     * @throws IOException If reading the data from the package fails.
-     * @throws SAXException if parsing the XML data fails.
-     */
+    
     public void process() throws IOException, OpenXML4JException, SAXException {
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(this.xlsxPackage);
         XSSFReader xssfReader = new XSSFReader(this.xlsxPackage);
@@ -324,4 +285,5 @@ public class XLSX2CSV {
         //XLSX2CSV.processOneSheet(xlsxFile.getPath(), null);
         XLSX2CSV.process(xlsxFile.getPath());
     }
+    */
 }

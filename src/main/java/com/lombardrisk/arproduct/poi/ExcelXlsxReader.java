@@ -3,13 +3,9 @@ package com.lombardrisk.arproduct.poi;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;  
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;  
 import org.apache.poi.openxml4j.opc.PackageAccess;
@@ -20,7 +16,6 @@ import org.apache.poi.xssf.model.SharedStringsTable;
 import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;  
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTRst;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;  
@@ -81,10 +76,12 @@ public class ExcelXlsxReader extends DefaultHandler{
 		 	parser.parse(sheetSource); //解析excel的每条记录，在这个过程中startElement()、characters()、endElement()这三个函数会依次执行
 		 	sheet.close();
 		 }
+		 pkg.clearRelationships();
+		 pkg.revert();
 	}
 	 public void removeSheet(String filename,String sheetname) {
 		 filePath = filename;
-		 OPCPackage pkg;
+		 OPCPackage pkg=null;
 		 XSSFReader xssfReader;
 		try {
 			pkg = OPCPackage.open(filename);
@@ -113,13 +110,16 @@ public class ExcelXlsxReader extends DefaultHandler{
 			 }
 		} catch ( IOException | OpenXML4JException  e) {
 			logger.error(e.getMessage(),e);
+		}finally{
+			pkg.clearRelationships();
+			pkg.revert();
 		}
 		
 	 }
 	 
 	 public List<List<String>> processOneSheet(String filename,String sheetname){
 		 filePath = filename;
-		 OPCPackage pkg;
+		 OPCPackage pkg=null;
 		 XSSFReader xssfReader;
 		try {
 			pkg = OPCPackage.open(filename);
@@ -149,12 +149,15 @@ public class ExcelXlsxReader extends DefaultHandler{
 					}
 				}
 			 }
-			 pkg.clearRelationships();
-			 pkg.close();
+			 
 		} catch ( IOException | OpenXML4JException | SAXException e) {
 			logger.error(e.getMessage(),e);
+		}finally{
+			pkg.clearRelationships();
+			pkg.revert();
+			System.gc();
 		}
-		System.gc();
+		
 		return list;
 		 
 	}

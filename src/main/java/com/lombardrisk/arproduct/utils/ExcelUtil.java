@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Name;
@@ -37,7 +36,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.lombardrisk.arproduct.poi.XLSX2CSV;
+import com.lombardrisk.arproduct.poi.ExcelXlsxReader;
 import com.lombardrisk.arproduct.pojo.Expected4ExportToExcel;
 
 
@@ -65,7 +64,7 @@ public class ExcelUtil {
 			row = sheet.getRow(amt);
 			try
 			{
-				row.getCell(0).setCellType(CellType.STRING);
+				row.getCell(0).setCellType(1);
 			}catch (Exception e){}
 			if(row!=null && row.getCell(0)!=null && StringUtils.isNotBlank(row.getCell(0).getStringCellValue())){
 				break;
@@ -252,7 +251,7 @@ public class ExcelUtil {
 			int address1;
 			Boolean search;
 			String no_A=null,status_E = null, msg_G = null, rowID = null,instance_D = null, checked_T=null,rst=null, instance_G;//in exported file
-			logger.info("Verify row:1 skip head row");
+			logger.info("Verify row:1 skip head row (expectedValue vs actualValue)");
 			for(long i=1;i<=amt_expected;i++){
 				//initial running
 				search=true;
@@ -347,7 +346,6 @@ public class ExcelUtil {
 							row_expected.createCell(9).setCellValue(msg_G);//column J
 						}
 						row_exported.createCell(19).setCellValue("c");// column T, add flag for checked row
-						//TODO
 						rst=setValRuleCompareRst(status_expected,status_E,ruleMsg_expected,msg_G);
 						logger.info("Verify row:"+(i+1)+" "+rst);
 						row_expected.createCell(12).setCellValue(rst);//column M
@@ -445,14 +443,11 @@ public class ExcelUtil {
 				return flagStr;
 			}
 			wb_expected=openWorkbook(file_expected);
-			//wb_exported=openWorkbook(file_exported);
-			Map<String,List<List<String>>> sheetConent=XLSX2CSV.processOneSheet(fileFullName_exported,null);
-			Iterator<Map.Entry<String,List<List<String>>>> sheetentries=sheetConent.entrySet().iterator();
-        	Map.Entry<String,List<List<String>>> sheetentry=sheetentries.next();
-			list_exported=sheetentry.getValue();
-            String sheet_exported=sheetentry.getKey();
-			//ExcelXlsxReader reader=new ExcelXlsxReader();
-			//list_exported=reader.processOneSheet(fileFullName_exported, null);
+
+			ExcelXlsxReader excelXlsxReader=new ExcelXlsxReader();
+			list_exported=excelXlsxReader.processOneSheet(fileFullName_exported, null);
+            String sheet_exported=excelXlsxReader.getSheetName();
+			
 			logger.info("exported file(need to be checked):"+fileFullName_exported);
 			logger.info("expected file:"+fileFullName_expected);
 			//delete sheet named log
@@ -477,7 +472,7 @@ public class ExcelUtil {
 			Entry<Integer, List<String>> map;
 			Boolean search;
 			String no_A=null,status_E = null, msg_G = null, rowID = null,instance_D = null, checked_T=null,rst=null, instance_G;//in exported file
-			logger.info("Verify row:1 skip head row");
+			logger.info("Verify row:1 skip head row (expectedValue vs actualValue)");
 			for(long i=1;i<=amt_expected;i++){
 				//initial running
 				search=true;
@@ -736,7 +731,7 @@ public class ExcelUtil {
 			//part3
 			int amt_exported=0,rowIndex_exported,colIndex_exported;
 			String aNamedAddress=null;
-			logger.info("Verify row:1 skip head row");
+			logger.info("Verify row:1 skip head row (expectedValue vs actualValue)");
 			//----
 			int i=1;
 			for(Expected4ExportToExcel expected_obj:it){
@@ -786,7 +781,7 @@ public class ExcelUtil {
 				}
 				
 				aNamedAddress="$"+colName_of_cellInfo+"$"+rowId_of_cellInfo; //$A$3
-				AreaReference[] arefs=AreaReference.generateContiguous(null, aNamedAddress);
+				AreaReference[] arefs=AreaReference.generateContiguous(aNamedAddress);
 				CellReference crefs=arefs[0].getFirstCell();
 				rowIndex_exported=crefs.getRow();
 				colIndex_exported=crefs.getCol();
@@ -901,7 +896,7 @@ public class ExcelUtil {
 			//part3
 			int amt_exported=0,rowIndex_exported,colIndex_exported;
 			String aNamedAddress=null;
-			logger.info("Verify row:1 skip head row");
+			logger.info("Verify row:1 skip head row (expectedValue vs actualValue)");
 			for(int i=1;i<=amt_expected;i++){
 				//clear setting
 				cell_comments=null;
@@ -952,7 +947,7 @@ public class ExcelUtil {
 				}
 				
 				aNamedAddress="$"+colName_of_cellInfo+"$"+rowId_of_cellInfo; //$A$3
-				AreaReference[] arefs=AreaReference.generateContiguous(null, aNamedAddress);
+				AreaReference[] arefs=AreaReference.generateContiguous(aNamedAddress);
 				CellReference crefs=arefs[0].getFirstCell();
 				rowIndex_exported=crefs.getRow();
 				colIndex_exported=crefs.getCol();
@@ -1202,33 +1197,56 @@ public class ExcelUtil {
 	private static String getDisplayCellValue(Cell cell){
 		String displayValue=null;
 		if(cell==null){return null;}
-		DataFormatter formatter=new DataFormatter(); 
-		//CellType type=(CellType) Helper.callMethodBy("poi-4.0.0.jar", "org.apache.poi.ss.usermodel.Cell", "getCellType", null, null);
-		if(cell.getCellType().equals(CellType.NUMERIC)){
-	    	if (DateUtil.isCellDateFormatted(cell))
-			{
-				//displayValue = formatter.formatCellValue(cell,cell.getRow().getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator()).trim();
-	    		int dataIndex=cell.getCellStyle().getDataFormat();
-	    		if(dataIndex==14){
-	    			displayValue=formatter.formatRawCellContents(cell.getNumericCellValue(),cell.getCellStyle().getDataFormat(),"MM/dd/yyyy").trim();
-	    		}else{
-	    			displayValue = formatter.formatRawCellContents(cell.getNumericCellValue(),cell.getCellStyle().getDataFormat(),cell.getCellStyle().getDataFormatString()).trim();
-	    		}
-			}else{
-				displayValue=formatter.formatRawCellContents(cell.getNumericCellValue(), cell.getCellStyle().getDataFormat(), cell.getCellStyle().getDataFormatString()).trim();				
-			}
+		DataFormatter formatter=new DataFormatter();
+		switch(cell.getCellType()){
+			case Cell.CELL_TYPE_NUMERIC:
+				if (DateUtil.isCellDateFormatted(cell))
+				{
+					//displayValue = formatter.formatCellValue(cell,cell.getRow().getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator()).trim();
+		    		int dataIndex=cell.getCellStyle().getDataFormat();
+		    		if(dataIndex==14){
+		    			displayValue=formatter.formatRawCellContents(cell.getNumericCellValue(),cell.getCellStyle().getDataFormat(),"MM/dd/yyyy").trim();
+		    		}else{
+		    			displayValue = formatter.formatRawCellContents(cell.getNumericCellValue(),cell.getCellStyle().getDataFormat(),cell.getCellStyle().getDataFormatString()).trim();
+		    		}
+				}else{
+					displayValue=formatter.formatRawCellContents(cell.getNumericCellValue(), cell.getCellStyle().getDataFormat(), cell.getCellStyle().getDataFormatString()).trim();				
+				}
+				break;
+			case Cell.CELL_TYPE_STRING:
+				displayValue = cell.getStringCellValue().trim();
+				break;
+			case Cell.CELL_TYPE_BOOLEAN:
+				displayValue = String.valueOf(cell.getBooleanCellValue());
+				break;
+			case Cell.CELL_TYPE_FORMULA:
+				displayValue = cell.getStringCellValue();
+				break;
+			case Cell.CELL_TYPE_BLANK:
+				displayValue = "";
+				break;
+			case Cell.CELL_TYPE_ERROR:
+				displayValue = "";
+				break;
+			default:
+				displayValue=cell.toString().trim();
+				break;
+		}
+		
+		/*if(cell.getCellType().equals(CellType.NUMERIC)){
+	    	
 	    	
 	    }else if(cell.getCellType().equals(CellType.STRING)){
-	    	displayValue = cell.getStringCellValue().trim();
+	    	
 	    }else if(cell.getCellType().equals(CellType.BOOLEAN)){
-	    	displayValue = String.valueOf(cell.getBooleanCellValue());
+	    	
 	    }else if(cell.getCellType().equals(CellType.FORMULA)){
-	    	displayValue = cell.getStringCellValue();
+	    	
 	    }else if(cell.getCellType().equals(CellType.BLANK) || cell.getCellType().equals(CellType.ERROR)){
 	    	displayValue = "";
 	    }else{
 	    	displayValue=cell.toString().trim();
-	    }
+	    }*/
 		return displayValue;
 	}
 	
@@ -1654,13 +1672,13 @@ public class ExcelUtil {
 	        	if(valueObj!=null)
 	        	{
 	        		cell=rootRow.createCell(indexOfColumn);
-	        		cell.setCellType(CellType.STRING);
+	        		cell.setCellType(1);//CellType.STRING
 	        		cell.setCellValue(valueObj.toString());
 	        	}
 	        	if(flagForWriteTitle)
 	        	{
 	        		cell=titleRow.createCell(indexOfColumn);
-	        		cell.setCellType(CellType.STRING);
+	        		cell.setCellType(1);//CellType.STRING
 	        		if(claes!=null && claes.contains(pojo))
 	        		{
 	        			cell.setCellValue(pojo.getSimpleName()+"."+name);
