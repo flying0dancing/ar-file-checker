@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.lombardrisk.arproduct</groupId>
-  <artifactId>arfilechecker</artifactId>
+  <artifactId>ar-file-checker</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>arfilechecker</name>
+  <name>ar-file-checker</name>
   <url>http://maven.apache.org</url>
 
   <properties>
