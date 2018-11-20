@@ -2,7 +2,7 @@ usage
 ===
 arfilechecker is an utility, also can be invoked in other Agile Reporter testing tools. It can use on Linux and Windows Oses.
 ------
-	java -jar arfilechecker.jar -Dfunc="excel" -Ddownload="c:\foo\download.xlsx" -Dexpectation="c:\foo\exptected.xlsx" -DlogPath="c:\foo\logs"  -DallInOne="c:\abc\checker.xlsx" -Dsheet="sheet1" -Df 
+	mvn exec:java -Dexec.mainClass="com.lombardrisk.arproduct.arfilechecker.Checker" -Dfunc="excel" -Ddownload="c:\foo\download.xlsx" -Dexpectation="c:\foo\exptected.xlsx" -DlogPath="c:\foo\logs"  -DallInOne="c:\abc\checker.xlsx" -Dsheet="sheet1"
 
 * [func]
     * choose one option for doing this function.
@@ -21,6 +21,7 @@ arfilechecker is an utility, also can be invoked in other Agile Reporter testing
 
 * [allInOne]
 	* It is a excel full name, default get first sheet for batch of doing one function.
+    * sheet need two column with header "exec_ExpectationFile", "exec_DownloadFile"	
 
 * [sheet]
     * optional
@@ -31,14 +32,15 @@ arfilechecker is an utility, also can be invoked in other Agile Reporter testing
 quick get started
 -------------------------------------------
 * check "export to excel" solo
-    `mvn test -Dfunc="excel" -Ddownload="c:\foo\download.xlsx" -Dexpectation="c:\foo\exptected.xlsx" -DlogPath="c:\foo\logs"`
+    `mvn exec:java -Dexec.mainClass="com.lombardrisk.arproduct.arfilechecker.Checker" -Dfunc="excel" -Ddownload="c:\foo\download.xlsx" -Dexpectation="c:\foo\exptected.xlsx" -DlogPath="c:\foo\logs"`
 * check "export to excel" batch
-    `mvn exec:java -Dexec.mainClass="com.lombardrisk.arproduct.arfilechecker.Checker" -Dfunc="val" -DallInOne="Z:\ProductLine\FED\TestResults\FED_1.14.2\Auto\1.14.2_AR1.16.0b75\scenarios-result\part2test.xlsx" -Dsheet="Val"`
-    `mvn test -Dfunc="val" -Ddownload="c:\foo\download.xlsx" -Dexpectation="c:\foo\exptected.xlsx" -DlogPath="c:\foo\logs"`
+    `mvn exec:java -Dexec.mainClass="com.lombardrisk.arproduct.arfilechecker.Checker" -Dfunc="excel" -DallInOne="c:\abc\checker.xlsx" -Dsheet="bbb"`
 * check "validation rules" solo
-    `mvn test -Dfunc="excel" -Ddownload="c:\foo\download.xlsx" -Dexpectation="c:\foo\exptected.xlsx"
+    `mvn exec:java -Dexec.mainClass="com.lombardrisk.arproduct.arfilechecker.Checker" -Dfunc="val" -Ddownload="c:\foo\download.xlsx" -Dexpectation="c:\foo\exptected.xlsx" -DlogPath="c:\foo\logs"`
 * check "validation rules" batch
-    `mvn test -Dfunc="val" -DallInOne="c:\abc\checker.xlsx" -Dsheet="Val"`
+    `mvn exec:java -Dexec.mainClass="com.lombardrisk.arproduct.arfilechecker.Checker" -Dfunc="val" -DallInOne="c:\abc\checker.xlsx" -Dsheet="bbb"`
+    or
+    `mvn exec:java -Dexec.mainClass="com.lombardrisk.arproduct.arfilechecker.Checker" -Dfunc="val" -DallInOne="c:\abc\checker.xlsx" -Dsheet="aaa"`
 
 sql instruction
 -------------------------------------------

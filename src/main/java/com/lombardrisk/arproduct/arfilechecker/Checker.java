@@ -24,7 +24,7 @@ public class Checker implements IComFolder
         long begin=System.currentTimeMillis();
     	long end=begin;
     	//read args from command-line
-    	if(args!=null && args.length>0){
+    	/*if(args!=null && args.length>0){
 			for(String s:args){
 				if(s.contains("=")){
 					String[] argKeyValue=s.split("=");
@@ -37,11 +37,7 @@ public class Checker implements IComFolder
 				
 			}
 			
-		}else{
-			logger.info("no args");
-			logger.info("total time(sec):"+(end-begin)/1000.00F);
-			return;
-		}
+		}*/
     	String funcType=System.getProperty(CMDL_FUNC);
     	String downloadFile=Helper.reviseFilePath(System.getProperty(CMDL_DOWNLOADFILE));
     	String expectedFile=Helper.reviseFilePath(System.getProperty(CMDL_EXPECTATION));
