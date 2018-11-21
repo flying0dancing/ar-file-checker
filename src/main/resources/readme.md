@@ -32,10 +32,12 @@ arfilechecker is an utility, also can be invoked in other Agile Reporter testing
 quick get started
 -------------------------------------------
 * check "export to excel" solo
+    result in c:\foo\logs\excelChecker.log
     `mvn exec:java -Dexec.mainClass="com.lombardrisk.arproduct.arfilechecker.Checker" -Dfunc="excel" -Ddownload="c:\foo\download.xlsx" -Dexpectation="c:\foo\exptected.xlsx" -DlogPath="c:\foo\logs"`
 * check "export to excel" batch
     `mvn exec:java -Dexec.mainClass="com.lombardrisk.arproduct.arfilechecker.Checker" -Dfunc="excel" -DallInOne="c:\abc\checker.xlsx" -Dsheet="bbb"`
 * check "validation rules" solo
+    result in c:\foo\logs\valRuleChecker.log
     `mvn exec:java -Dexec.mainClass="com.lombardrisk.arproduct.arfilechecker.Checker" -Dfunc="val" -Ddownload="c:\foo\download.xlsx" -Dexpectation="c:\foo\exptected.xlsx" -DlogPath="c:\foo\logs"`
 * check "validation rules" batch
     `mvn exec:java -Dexec.mainClass="com.lombardrisk.arproduct.arfilechecker.Checker" -Dfunc="val" -DallInOne="c:\abc\checker.xlsx" -Dsheet="bbb"`
