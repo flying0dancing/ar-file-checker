@@ -604,6 +604,7 @@ public class ExcelUtil {
 				if(StringUtils.isNotBlank(no_A) && !checked_T.equals("checkedForValidation") && !status_E.equalsIgnoreCase("pass")){
 					msg_G = null; rowID = null; instance_D = null;//clear info
 					if(uncheckederrNo==0){
+						flagStr="fail";
 						log_expected = wb_expected.createSheet(ewTestLog);
 						row_expected=log_expected.createRow(uncheckederrNo);
 						//set head row
@@ -615,6 +616,12 @@ public class ExcelUtil {
 					}else if(uncheckederrNo==1){
 						log_expected = wb_expected.getSheet(ewTestLog);
 					}
+					//add flag at column T for checked row
+					for(int colIndex=row_exported.size();colIndex<19;colIndex++){
+						row_exported.add("");
+					}
+					row_exported.add("checkedForValidation");//add flag at column T for checked row
+					list_exported.set(i, row_exported);//add flag at column T for checked row
 					uncheckederrNo++;
 					row_expected=log_expected.createRow(uncheckederrNo);
 					//set value
