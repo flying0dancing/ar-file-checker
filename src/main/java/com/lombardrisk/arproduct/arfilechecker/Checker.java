@@ -44,7 +44,7 @@ public class Checker implements IComFolder
     	String allInOneFile=Helper.reviseFilePath(System.getProperty(CMDL_ALLINONE));
     	String allInOneSheet=Helper.reviseFilePath(System.getProperty(CMDL_SHEET));
     	String logPath=Helper.reviseFilePath(System.getProperty(CMDL_LOGPATH));
-    	FileUtil.createNew(logPath);
+    	FileUtil.createDirectories(logPath);
     	if(StringUtils.isBlank(funcType)){
 			logger.error("please set argument -Dfunc, details see readme.");
 			Helper.readme("readme.md");
@@ -60,7 +60,7 @@ public class Checker implements IComFolder
     			FileUtil.writeContentToEmptyFile(logFullName+"excelChecker.log", schecker.getExecutionStatus());
     		}else if(funcType.toLowerCase().startsWith(FUNC_VALIDATION)){
     			logger.info("=====================check validation rule =====================");
-    			schecker=new ExcelChecker(downloadFile,expectedFile);
+    			schecker=new ValidationRuleChecker(downloadFile,expectedFile);
     			schecker.checker();
     			FileUtil.writeContentToEmptyFile(logFullName+"valRuleChecker.log", schecker.getExecutionStatus());
     		}else{
