@@ -121,13 +121,13 @@ public class Helper {
     	if(StringUtils.isNotBlank(path)){
     		path=path.replace("\"", "");
     		
-			if(System.getProperty("file.separator").equals("/")){
-				path=path.replace("\\", "/");
+    		if(System.getProperty("file.separator").equals("/")){
+				path=path.replace("\\\\", "/");
 				path=path.replaceAll("/+", "/");
 			}else
 			{
 				path=path.replace("/", "\\");
-				path=path.replaceAll("\\+", "\\");
+				path=path.replaceAll("\\\\+", "\\\\");
 			}
 			if(path.contains(" "))
 			{
