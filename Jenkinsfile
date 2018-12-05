@@ -16,8 +16,8 @@ pipeline {
             steps {
                 echo "start job ${JOB_URL}..."
                 echo "path:${PATH}"
-                checkout([$class: 'GitSCM', branches: [[name: ':origin/branch.*']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins', url: 'https://Jenkins@bitbucket.lombardrisk.com/scm/aut/ar-file-checker.git']]])
-                
+                //checkout([$class: 'GitSCM', branches: [[name: ':origin/branch.*']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins', url: 'https://Jenkins@bitbucket.lombardrisk.com/scm/aut/ar-file-checker.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins', url: 'https://Jenkins@bitbucket.lombardrisk.com/scm/aut/ar-file-checker.git']]])
             }
         }
         stage ('Artifactory configuration') {
