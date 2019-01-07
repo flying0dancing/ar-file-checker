@@ -9,8 +9,11 @@ buildInfo = Artifactory.newBuildInfo()
 pipeline {
     agent { label 'master' } 
     environment {
-    JAVA_HOME = tool 'JDK8'
-  }
+		JAVA_HOME = tool 'JDK8'
+	}
+	triggers {
+		pollSCM('H/15 7-19 * * 1-5')
+	}
     stages {
         stage('Build') { 
             steps {
