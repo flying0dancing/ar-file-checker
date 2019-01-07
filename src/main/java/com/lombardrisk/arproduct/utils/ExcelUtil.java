@@ -446,6 +446,11 @@ public class ExcelUtil {
 
 			ExcelXlsxReader excelXlsxReader=new ExcelXlsxReader();
 			list_exported=excelXlsxReader.processOneSheet(fileFullName_exported, null);
+			String exportedFileV="1.16.1";
+			if(list_exported.get(0).get(0).equalsIgnoreCase("Rule Type")){
+				//validation rules' export file are updated. started from agile reporter v1.16.2
+				exportedFileV="1.16.2";
+			}
             String sheet_exported=excelXlsxReader.getSheetName();
 			
 			logger.info("exported file(need to be checked):"+fileFullName_exported);
@@ -500,7 +505,12 @@ public class ExcelUtil {
 				status_expected=getCellValue_expected(row_expected,6);//column G
 				ruleMsg_expected=getCellValue_expected(row_expected,8);//column I
 				//find rule from exported excel
-				addresses=findCell(list_exported,ruleTypeNo_expected,0,0);
+				if(exportedFileV.equals("1.16.1")){
+					addresses=findCell(list_exported,ruleTypeNo_expected);
+				}else{
+					addresses=findCell(list_exported,ruleType_expected,ruleNo_expected);
+				}
+				
 				entries = addresses.entrySet().iterator(); 
 				if(addresses==null || addresses.size()<=0){
 					logger.error("Verify row:"+(i+1)+" fail to find");
@@ -516,9 +526,16 @@ public class ExcelUtil {
                     status_E = null; msg_G = null; rowID = null; instance_D = null;rst=null;instance_G="";//clear info
                     map=entries.next();
                     row_exported=map.getValue();
-                    instance_D=row_exported.get(3);//column D
-                    status_E=row_exported.get(4);//column E
-                    msg_G=row_exported.get(6);//column G
+                    if(exportedFileV.equals("1.16.1")){
+                    	instance_D=row_exported.get(3);//column D
+                        status_E=row_exported.get(4);//column E
+                        msg_G=row_exported.get(6);//column G
+                    }else{
+                    	instance_D=row_exported.get(4);//column E
+                        status_E=row_exported.get(5);//column F
+                        msg_G=row_exported.get(7);//column H
+                    }
+                    
                     if(StringUtils.isNotBlank(msg_G)){
                     	if(msg_G.contains("Row:")){
                     		rowID=msg_G.replace("\n", "").replaceAll(".*\\[Row:(.+?)\\].*", "$1");
@@ -567,12 +584,12 @@ public class ExcelUtil {
 						if(StringUtils.isNotBlank(msg_G)){
 							row_expected.createCell(9).setCellValue(msg_G);//column J
 						}
-						//add flag at column T for checked row
-						for(int colIndex=row_exported.size();colIndex<19;colIndex++){
+						//add flag at column U for checked row
+						for(int colIndex=row_exported.size();colIndex<20;colIndex++){
 							row_exported.add("");
 						}
-						row_exported.add("checkedForValidation");//add flag at column T for checked row
-						list_exported.set(map.getKey(), row_exported);//add flag at column T for checked row
+						row_exported.add("checkedForValidation");//add flag at column U for checked row
+						list_exported.set(map.getKey(), row_exported);//add flag at column U for checked row
 						rst=setValRuleCompareRst(status_expected,status_E,ruleMsg_expected,msg_G);
 						logger.info("Verify row:"+(i+1)+" "+rst);
 						row_expected.createCell(12).setCellValue(rst);//column M
@@ -598,8 +615,13 @@ public class ExcelUtil {
 				row_exported=list_exported.get(i);
 				no_A=null;checked_T=null;status_E = null; //clear info
 				no_A=row_exported.get(0);//column A
-				status_E=row_exported.get(4);//column E
-				checked_T=row_exported.get(row_exported.size()-1);//column T
+				if(exportedFileV.equals("1.16.1")){
+					status_E=row_exported.get(4);//column E
+				}else{
+					status_E=row_exported.get(5);//column F
+				}
+				
+				checked_T=row_exported.get(row_exported.size()-1);//column U
 				//if(checked_T.equals("c")){row_exported.removeCell(row_exported.getCell(19));}
 				if(StringUtils.isNotBlank(no_A) && !checked_T.equals("checkedForValidation") && !status_E.equalsIgnoreCase("pass")){
 					msg_G = null; rowID = null; instance_D = null;//clear info
@@ -616,22 +638,31 @@ public class ExcelUtil {
 					}else if(uncheckederrNo==1){
 						log_expected = wb_expected.getSheet(ewTestLog);
 					}
-					//add flag at column T for checked row
-					for(int colIndex=row_exported.size();colIndex<19;colIndex++){
+					//add flag at column U for checked row
+					for(int colIndex=row_exported.size();colIndex<20;colIndex++){
 						row_exported.add("");
 					}
-					row_exported.add("checkedForValidation");//add flag at column T for checked row
-					list_exported.set(i, row_exported);//add flag at column T for checked row
+					row_exported.add("checkedForValidation");//add flag at column U for checked row
+					list_exported.set(i, row_exported);//add flag at column U for checked row
 					uncheckederrNo++;
 					row_expected=log_expected.createRow(uncheckederrNo);
 					//set value
-					shortRuleType=getShortRuleType(no_A);
-					msg_G=row_exported.get(6);//column G
+					
+					if(exportedFileV.equals("1.16.1")){
+						shortRuleType=getShortRuleType(no_A);
+						msg_G=row_exported.get(6);//column G
+						row_expected.createCell(2).setCellValue(shortRuleType);//RuleType
+						row_expected.createCell(3).setCellValue(no_A.replaceAll(".*?(\\d+)", "$1"));//RuleID
+					}else{
+						msg_G=row_exported.get(7);//column H
+						row_expected.createCell(2).setCellValue(no_A.replace("Reg ", ""));//RuleType
+						row_expected.createCell(3).setCellValue(row_exported.get(1));//RuleID
+					}
+					
 					instance_D=getInstanceFromExportedExcel(msg_G);
 					rowID=getRowIDFromExportedExcel(msg_G);
 					row_expected.createCell(1).setCellValue("Y");//Check
-					row_expected.createCell(2).setCellValue(shortRuleType);//RuleType
-					row_expected.createCell(3).setCellValue(no_A.replaceAll(".*?(\\d+)", "$1"));//RuleID
+					
 					
 					row_expected.createCell(4).setCellValue(instance_D);//Instance
 					row_expected.createCell(5).setCellValue(rowID);//RowID
@@ -1076,6 +1107,46 @@ public class ExcelUtil {
 					result.put(i, row);
 				}
 			}
+		}
+		return result;
+	}
+	/***
+	 * get a list of matching rows, match exported file version smaller than or equal to 1.16.1
+	 * @param list
+	 * @param searchcontent
+	 * @param startColumn
+	 * @param endColumn
+	 * @return
+	 */
+	public static Map<Integer,List<String>> findCell(List<List<String>> list,String searchcontent){
+		Map<Integer,List<String>> result=new HashMap<Integer,List<String>>();
+		List<String> row;
+		for(int i=0;i<list.size();i++){
+			row=list.get(i);
+			if(StringUtils.equalsIgnoreCase(searchcontent, row.get(0))){
+				result.put(i, row);
+			}
+		}
+		return result;
+	}
+	/**
+	 * get a list of matching rows, match exported file version larger than 1.16.2
+	 * @param list
+	 * @param searchRuleType
+	 * @param searchId
+	 * @return
+	 */
+	public static Map<Integer,List<String>> findCell(List<List<String>> list,String searchRuleType,String searchId){
+		Map<Integer,List<String>> result=new HashMap<Integer,List<String>>();
+		List<String> row;
+		int startColumn=0;int endColumn=1;
+		
+		if(startColumn>endColumn){return result;}
+		for(int i=0;i<list.size();i++){
+			row=list.get(i);
+			if(StringUtils.equalsIgnoreCase("Reg "+searchRuleType, row.get(0)) && searchId.equalsIgnoreCase(row.get(1))){
+				result.put(i, row);
+			} 
 		}
 		return result;
 	}
@@ -1573,7 +1644,7 @@ public class ExcelUtil {
 	        // 设置字段可访问（必须，否则报错）  
 	        field.setAccessible(true);  
 	        // 得到字段的属性名  
-	        String name = field.getName();  
+	        String name = field.getName();
 	        // 这一段的作用是如果字段在Element中不存在会抛出异常，如果出异常，则跳过。
 	        String rootCellValue=null;
 	        try  
