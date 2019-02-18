@@ -623,7 +623,7 @@ public class ExcelUtil {
 				
 				checked_T=row_exported.get(row_exported.size()-1);//column U
 				//if(checked_T.equals("c")){row_exported.removeCell(row_exported.getCell(19));}
-				if(StringUtils.isNotBlank(no_A) && !checked_T.equals("checkedForValidation") && !status_E.equalsIgnoreCase("pass")){
+				if(StringUtils.isNotBlank(no_A) && !checked_T.equals("checkedForValidation") && !status_E.equalsIgnoreCase("pass") && !status_E.equalsIgnoreCase("Ignored")){
 					msg_G = null; rowID = null; instance_D = null;//clear info
 					if(uncheckederrNo==0){
 						flagStr="fail";
