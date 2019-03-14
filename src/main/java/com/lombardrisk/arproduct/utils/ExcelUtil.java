@@ -492,10 +492,10 @@ public class ExcelUtil {
 				ruleNo_expected=getCellValue_expected(row_expected,3);//column D
 				ruleType_expected=getCellValue_expected(row_expected,2);//column C
 				ruleTypeNo_expected=getFullRuleNo(ruleType_expected,ruleNo_expected);
-				if(ruleTypeNo_expected==null){
-					logger.error("Verify row:"+(i+1)+" fail to find this Rule Type, should be any of Val, XVal, UVal, UXVal");
-					row_expected.createCell(7).setCellValue("fail to find this Rule Type, should be any of Val, XVal, UVal, UXVal");//column H
-					row_expected.createCell(12).setCellValue("fail to find this Rule Type, should be any of Val, XVal, UVal, UXVal");//column M
+				if(ruleTypeNo_expected==null && exportedFileV.equals("1.16.1")){
+					logger.error("Verify row:"+(i+1)+" fail to find this Rule Type, should be any of Val, XVal, UVal, UXVal, Cross-Val");
+					row_expected.createCell(7).setCellValue("fail to find this Rule Type, should be any of Val, XVal, UVal, UXVal, Cross-Val");//column H
+					row_expected.createCell(12).setCellValue("fail to find this Rule Type, should be any of Val, XVal, UVal, UXVal, Cross-Val");//column M
 					flagStr="fail";
 					continue;
 				}
