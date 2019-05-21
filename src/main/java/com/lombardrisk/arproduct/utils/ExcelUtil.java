@@ -826,6 +826,13 @@ public class ExcelUtil {
 				if(StringUtils.isNotBlank(rowIdStr_expected)){
 					rowIndex_exported=findCell(sheet_exported,rowIdStr_expected,rowIndex_exported,0,amt_exported,colIndex_exported);
 				}
+				if(rowIndex_exported<0){
+					logger.error("Verify row:"+(i+1)+"cannot find exported cell in "+csvUtil.getCsvPath()+csvUtil.getTableName()+".csv");
+					expected_obj.setTestResult("fail to find this cell");//column F testResult
+					flagStr="fail";
+					i++;
+					continue;
+				}
 				Row row_exported=sheet_exported.getRow(rowIndex_exported);
 				actualValue_expected=getCellValue_expected(row_exported,colIndex_exported);
 				expected_obj.setAcctualValue(actualValue_expected);;//column E
@@ -991,6 +998,12 @@ public class ExcelUtil {
 				colIndex_exported=crefs.getCol();
 				if(StringUtils.isNotBlank(rowIdStr_expected)){
 					rowIndex_exported=findCell(sheet_exported,rowIdStr_expected,rowIndex_exported,0,amt_exported,colIndex_exported);
+				}
+				if(rowIndex_exported<0){
+					logger.error("cannot find expected cell in "+csvUtil.getCsvPath()+csvUtil.getTableName()+".csv");
+					row_expected.createCell(5).setCellValue("fail to find this cell");//column F
+					flagStr="fail";
+					continue;
 				}
 				Row row_exported=sheet_exported.getRow(rowIndex_exported);
 				actualValue_expected=getCellValue_expected(row_exported,colIndex_exported);
