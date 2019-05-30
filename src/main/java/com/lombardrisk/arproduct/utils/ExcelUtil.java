@@ -752,6 +752,7 @@ public class ExcelUtil {
 			inp_exported = new FileInputStream(file_exported);
 			wb_exported=WorkbookFactory.create(inp_exported);
 			inp_exported.close();
+			logger.info("exported cell info stored in:"+csvUtil.getCsvPath()+csvUtil.getTableName()+".csv");
 			logger.info("exported file(need to be checked):"+fileFullName_exported);
 			logger.info("expected file:"+fileFullName_expected);
 			List<Expected4ExportToExcel> it=getObjects(fileFullName_expected, sheetName_expected, false, Expected4ExportToExcel.class);
@@ -798,7 +799,7 @@ public class ExcelUtil {
 					rowId_of_cellInfo=Integer.parseInt(cellInfo.get(3));
 					colName_of_cellInfo=cellInfo.get(4);
 				}else{
-					logger.error("Verify row:"+(i+1)+"cannot find expected cell in "+csvUtil.getCsvPath()+csvUtil.getTableName()+".csv");
+					logger.error("Verify row:"+(i+1)+" cannot find expected cell info");
 					expected_obj.setTestResult("fail to find this cell");//column F testResult
 					flagStr="fail";
 					i++;
@@ -827,7 +828,7 @@ public class ExcelUtil {
 					rowIndex_exported=findCell(sheet_exported,rowIdStr_expected,rowIndex_exported,0,amt_exported,colIndex_exported);
 				}
 				if(rowIndex_exported<0){
-					logger.error("Verify row:"+(i+1)+"cannot find exported cell in "+csvUtil.getCsvPath()+csvUtil.getTableName()+".csv");
+					logger.error("Verify row:"+(i+1)+" cannot find exported cell info");
 					expected_obj.setTestResult("fail to find this cell");//column F testResult
 					flagStr="fail";
 					i++;
@@ -1127,8 +1128,6 @@ public class ExcelUtil {
 	 * get a list of matching rows, match exported file version smaller than or equal to 1.16.1
 	 * @param list
 	 * @param searchcontent
-	 * @param startColumn
-	 * @param endColumn
 	 * @return
 	 */
 	public static Map<Integer,List<String>> findCell(List<List<String>> list,String searchcontent){
@@ -1291,17 +1290,20 @@ public class ExcelUtil {
 		DataFormatter formatter=new DataFormatter();
 		switch(cell.getCellType()){
 			case Cell.CELL_TYPE_NUMERIC:
+				String dataFormatStr=cell.getCellStyle().getDataFormatString();
+				short dataIndex=cell.getCellStyle().getDataFormat();
+				double numericCellVal=cell.getNumericCellValue();
 				if (DateUtil.isCellDateFormatted(cell))
 				{
 					//displayValue = formatter.formatCellValue(cell,cell.getRow().getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator()).trim();
-		    		int dataIndex=cell.getCellStyle().getDataFormat();
+
 		    		if(dataIndex==14){
-		    			displayValue=formatter.formatRawCellContents(cell.getNumericCellValue(),cell.getCellStyle().getDataFormat(),"MM/dd/yyyy").trim();
+		    			displayValue=formatter.formatRawCellContents(numericCellVal,dataIndex,"MM/dd/yyyy").trim();
 		    		}else{
-		    			displayValue = formatter.formatRawCellContents(cell.getNumericCellValue(),cell.getCellStyle().getDataFormat(),cell.getCellStyle().getDataFormatString()).trim();
+		    			displayValue = formatter.formatRawCellContents(numericCellVal,dataIndex,dataFormatStr).trim();
 		    		}
 				}else{
-					displayValue=formatter.formatRawCellContents(cell.getNumericCellValue(), cell.getCellStyle().getDataFormat(), cell.getCellStyle().getDataFormatString()).trim();				
+					displayValue=formatter.formatRawCellContents(numericCellVal, dataIndex, "#,##0;-#,##0").trim();
 				}
 				break;
 			case Cell.CELL_TYPE_STRING:
@@ -1347,7 +1349,7 @@ public class ExcelUtil {
 	 * save Workbook.<br>created by Kun.Shen
 	 * <p>after editing all cells, then write it to Workbook.
 	 * @param filename a excel file.
-	 * @param workBook a Workbook
+	 * @param wb a Workbook
 	 * @throws Exception
 	 */
 	public static void saveWorkbook(File filename,Workbook wb)
@@ -1369,7 +1371,8 @@ public class ExcelUtil {
 	 * save Workbook.<br>created by Kun.Shen
 	 * <p>after editing all cells, then write it to Workbook.
 	 * @param filename a excel file.
-	 * @param workBook a Workbook
+	 * @param sheetName a Workbook
+	 * @param list
 	 * @throws Exception
 	 */
 	public static void saveWorkbook(String filename,String sheetName,List<List<String>> list) throws Exception
@@ -1913,7 +1916,7 @@ public class ExcelUtil {
 	 * @param excelFileStr fullpath with file name (support .xlsx and .xls formats)
 	 * @param sheetName, if {sheetName} is null, {rewrite} is true, get the last sheet
 	 * @param rewrite
-	 * @param inner classes
+	 * @param claes classes
 	 * @since 2017.10.25
 	 */
 	@SuppressWarnings("rawtypes")
@@ -2028,7 +2031,7 @@ public class ExcelUtil {
 	 * @param excelFileStr fullpath with file name (support .xlsx and .xls formats)
 	 * @param sheetName, if {sheetName} is null, {rewrite} is true, get the last sheet
 	 * @param rewrite
-	 * @param inner classes
+	 * @param claes classes
 	 * @since 2017.10.25
 	 */
 	@SuppressWarnings("rawtypes")
