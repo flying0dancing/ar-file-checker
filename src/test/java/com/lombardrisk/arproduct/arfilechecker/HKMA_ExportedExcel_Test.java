@@ -38,13 +38,27 @@ public class HKMA_ExportedExcel_Test
     public void testHKMA() throws Exception
     {
     	System.out.println("love");
-    	String downloadFile=downPath+"HKMA_0002_CGS_v0_20200731.xlsx";
-    	String expectation=expectedPath+"CGS_V0_0001_20190731_ARDisplay.xlsx";
+    	String downloadFile=downPath+"HKMA_0002_CGS_v0_20200731(1).xlsx";
+    	String expectation=expectedPath+"CGS_V0_0001_20190731_ARDisplay(3).xlsx";
 
     	String log="";
     	ExcelChecker achecker=new ExcelChecker( downloadFile, expectation);
     	Boolean flag=achecker.checker(downloadFile, expectation);
     	assertTrue( flag );
     }
-    
+    /**
+     * Rigourous Test :-)
+     * @throws Exception
+     */
+    public void testHKMA2() throws Exception
+    {
+        System.out.println("love");
+        String downloadFile=downPath+"HKMA_0002_IB_V2_v2_20200731(3).xlsx";
+        String expectation=expectedPath+"IB_V2_V2_0001_20190731_ARDisplay(3).xlsx";
+
+        String log="";
+        ExcelChecker achecker=new ExcelChecker( downloadFile, expectation);
+        Boolean flag=achecker.checker(downloadFile, expectation);
+        assertTrue( flag );
+    }
 }

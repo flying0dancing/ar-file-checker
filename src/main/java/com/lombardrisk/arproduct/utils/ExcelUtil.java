@@ -1303,7 +1303,12 @@ public class ExcelUtil {
 		    			displayValue = formatter.formatRawCellContents(numericCellVal,dataIndex,dataFormatStr).trim();
 		    		}
 				}else{
-					displayValue=formatter.formatRawCellContents(numericCellVal, dataIndex, "#,##0;-#,##0").trim();
+					if(dataFormatStr.contains(")")){
+						displayValue=formatter.formatRawCellContents(numericCellVal, dataIndex, "#,##0;-#,##0").trim();
+					}else{
+						displayValue = formatter.formatRawCellContents(numericCellVal,dataIndex,dataFormatStr).trim();
+					}
+
 				}
 				break;
 			case Cell.CELL_TYPE_STRING:
