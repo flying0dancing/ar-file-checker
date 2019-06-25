@@ -434,8 +434,8 @@ private String getFirstCell(String ref){
      */  
     public static void main(String[] args) throws Exception {  
   
-    	String file = "Z:\\ProductLine\\FED\\TestResults\\FED_1.14.2\\Auto\\1.14.2_AR1.16.0b75\\download\\US FED Reserve(ExportValidation)_arfileck\\FFIEC009_v1_2999_12312015_validations.xlsx";  
-  
+    	//String file = "Z:\\ProductLine\\FED\\TestResults\\FED_1.14.2\\Auto\\1.14.2_AR1.16.0b75\\download\\US FED Reserve(ExportValidation)_arfileck\\FFIEC009_v1_2999_12312015_validations.xlsx";
+		String file="Z:\\ProductLine\\HKMA\\autoResults\\HKMA5.29.0_NewReturns-2\\download\\Hong Kong Monetary Authority(ExportToExcelApplyScale)\\HKMA_0001_T10BLGE_v1_20180330.xlsx";
     	ExcelXlsxReader reader = new ExcelXlsxReader();  
     	
     	List<List<String>> alist=reader.processOneSheet(file,null);

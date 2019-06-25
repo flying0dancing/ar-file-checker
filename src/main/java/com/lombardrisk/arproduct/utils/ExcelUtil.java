@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -1191,6 +1192,7 @@ public class ExcelUtil {
 		Workbook workBook=null;
 		try {
 			inp = new FileInputStream(filename);
+			ZipSecureFile.setMinInflateRatio(-1.0d);
 			workBook = WorkbookFactory.create(inp);
 			inp.close();
 		} catch (EncryptedDocumentException e) {
@@ -1221,6 +1223,7 @@ public class ExcelUtil {
 				File excelFH=new File(excelFullName);
 				File csvFH=new File(csvFullName);
 				if(excelFH.exists()){
+
 					Workbook workbook=openWorkbook(excelFH);
 					if(workbook!=null){
 						//List<Name> allNames=(List<Name>) workbook.getAllNames();

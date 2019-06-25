@@ -198,7 +198,7 @@ public abstract class ExcelReader extends DefaultHandler {
      */  
     public static void main(String[] args) throws Exception {  
   
-String file = "Z:\\ProductLine\\FED\\TestResults\\FED_1.14.2\\Auto\\1.14.2_AR1.16.0b75\\download\\US FED Reserve(ExportValidation)_arfileck\\FR2644_v3_2999_01032018_validations.xlsx";  
+String file = "Z:\\ProductLine\\FED\\TestResults\\FED_1.14.2\\Auto\\1.14.2_AR1.16.0b75\\download\\US FED Reserve(ExportValidation)_arfileck\\FR2644_v3_2999_01032018_validations.xlsx";
   
 ExcelReader reader = new ExcelReader() {  
     public void getRows(int sheetIndex, int curRow, List<String> rowList) {  
