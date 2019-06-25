@@ -1306,7 +1306,7 @@ public class ExcelUtil {
 		    			displayValue = formatter.formatRawCellContents(numericCellVal,dataIndex,dataFormatStr).trim();
 		    		}
 				}else{
-					if(dataFormatStr.contains(")")){
+					if(dataFormatStr.contains("#,##0_)")){
 						displayValue=formatter.formatRawCellContents(numericCellVal, dataIndex, "#,##0;-#,##0").trim();
 					}else{
 						displayValue = formatter.formatRawCellContents(numericCellVal,dataIndex,dataFormatStr).trim();

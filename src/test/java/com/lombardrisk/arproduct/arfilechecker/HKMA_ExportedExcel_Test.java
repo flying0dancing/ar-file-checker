@@ -31,11 +31,22 @@ public class HKMA_ExportedExcel_Test
         return new TestSuite( HKMA_ExportedExcel_Test.class );
     }
 
+    public void testHKMA_ARPA85() throws Exception
+    {
+        System.out.println("love");
+        String downloadFile=downPath+"HKMA_0001_T50CD_v1_20180330.xlsx";
+        String expectation=expectedPath+"T50CD_V1_0001_ARDisplay.xlsx";
+
+        String log="";
+        ExcelChecker achecker=new ExcelChecker( downloadFile, expectation);
+        Boolean flag=achecker.checker(downloadFile, expectation);
+        assertTrue( flag );
+    }
     /**
      * Rigourous Test :-)
      * @throws Exception 
      */
-    public void testHKMA() throws Exception
+    public void testHKMA_ARPA86_1() throws Exception
     {
     	System.out.println("love");
     	String downloadFile=downPath+"HKMA_0001_T10LE_v1_20180330.xlsx";
@@ -50,7 +61,7 @@ public class HKMA_ExportedExcel_Test
      * Rigourous Test :-)
      * @throws Exception
      */
-    public void testHKMA2() throws Exception
+    public void testHKMA_ARPA86_2() throws Exception
     {
         System.out.println("love");
         String downloadFile=downPath+"HKMA_0001_T10BLGE_v1_20180330.xlsx";
