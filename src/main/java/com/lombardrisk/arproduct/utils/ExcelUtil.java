@@ -202,228 +202,7 @@ public class ExcelUtil {
 		}
 		return str;
 	}
-	/***
-	 * deprecated, unable to handler bigger excel
-	 * @param fileFullName_expected
-	 * @param sheetName_expected
-	 * @param fileFullName_exported
-	 * @return
-	 */
-	public static String writeValidationRulesResult0(String fileFullName_expected, String sheetName_expected,String fileFullName_exported)
-	{
-		String flagStr="pass";
-		Workbook wb_expected, wb_exported;
-		//InputStream inp_expected;
-		//InputStream inp_exported;
-		//FileOutputStream out_expected, out_exported;
-		String ewTestLog="log";
-		try
-		{
-			File file_expected=new File(fileFullName_expected);
-			if(!file_expected.isFile()){
-				flagStr="error: File Not Found "+fileFullName_expected;
-				return flagStr;
-			}
-			File file_exported=new File(fileFullName_exported);
-			if(!file_exported.isFile()){
-				flagStr="error: File Not Found "+fileFullName_exported;
-				return flagStr;
-			}
-			wb_expected=openWorkbook(file_expected);
-			wb_exported=openWorkbook(file_exported);
-			logger.info("exported file(need to be checked):"+fileFullName_exported);
-			logger.info("expected file:"+fileFullName_expected);
-			//delete sheet named log
-			deleteSheet(wb_expected,ewTestLog);
-			Sheet sheet_expected = null, sheet_exported=null;
-			int amt_expected = 0,amt_exported=0;
-			
-			amt_expected = getLastRowNum(wb_expected,sheetName_expected);
-			amt_exported = getLastRowNum(wb_exported,null);
-			sheet_expected = getSheet(wb_expected,sheetName_expected);
-			sheet_exported=wb_exported.getSheetAt(0);
-			if(sheet_exported==null || sheet_expected==null){
-				flagStr="error: cannot get first sheet ";
-				return flagStr;
-			}
-			ExcelUtil.saveWorkbook(file_exported, wb_exported);
-			Row row_expected=null,row_exported=null;
-			String check_expected=null, ruleType_expected=null, ruleNo_expected=null,ruleTypeNo_expected=null, instance_expected = null, rowIdStr_expected = null, status_expected = null, ruleMsg_expected = null;
-			int address1;
-			Boolean search;
-			String no_A=null,status_E = null, msg_G = null, rowID = null,instance_D = null, checked_T=null,rst=null, instance_G;//in exported file
-			logger.info("Verify row:1 skip head row (expectedValue vs actualValue)");
-			for(long i=1;i<=amt_expected;i++){
-				//initial running
-				search=true;
-				rst=null;
-				address1=-1;
-				//part1 set expected info
-				row_expected=sheet_expected.getRow((int) i);
-				if(row_expected==null)continue;
-				check_expected=getCellValue_expected(row_expected,1);//column B
-				if(!check_expected.equalsIgnoreCase("y")){continue;}
 
-				//get expected info
-				ruleNo_expected=getCellValue_expected(row_expected,3);//column D
-				ruleType_expected=getCellValue_expected(row_expected,2);//column C
-				ruleTypeNo_expected=getFullRuleNo(ruleType_expected,ruleNo_expected);
-				if(ruleTypeNo_expected==null){
-					logger.error("Verify row:"+(i+1)+" fail to find this Rule Type, should be any of Val, XVal, UVal, UXVal");
-					row_expected.createCell(7).setCellValue("fail to find this Rule Type, should be any of Val, XVal, UVal, UXVal");//column H
-					row_expected.createCell(12).setCellValue("fail to find this Rule Type, should be any of Val, XVal, UVal, UXVal");//column M
-					flagStr="fail";
-					continue;
-				}
-
-				instance_expected=getCellValue_expected(row_expected,4);//column E
-				rowIdStr_expected=getCellValue_expected(row_expected,5);//column F
-				status_expected=getCellValue_expected(row_expected,6);//column G
-				ruleMsg_expected=getCellValue_expected(row_expected,8);//column I
-				//find rule from exported excel
-				address1=findCell(sheet_exported,ruleTypeNo_expected,1, 0, amt_exported,0);
-				if(address1<0){
-					logger.error("Verify row:"+(i+1)+" fail to find");
-					row_expected.createCell(7).setCellValue("fail to find");//column H
-					row_expected.createCell(12).setCellValue("fail to find");//column M
-					flagStr="fail";
-					continue;
-				}
-				
-				while(address1>0 && search){
-					search = false;//reset search for false means no need to search again.
-                    Boolean asiaFlag = false;
-                    status_E = null; msg_G = null; rowID = null; instance_D = null;rst=null;instance_G="";//clear info
-                    row_exported=sheet_exported.getRow(address1);
-                    instance_D=getCellValue_expected(row_exported,3);//column D
-                    status_E=getCellValue_expected(row_exported,4);//column E
-                    msg_G=getCellValue_expected(row_exported,6);//column G
-                    if(StringUtils.isNotBlank(msg_G)){
-                    	if(msg_G.contains("Row:")){
-                    		rowID=msg_G.replace("\n", "").replaceAll(".*\\[Row:(.+?)\\].*", "$1");
-                    	}
-                    	if( msg_G.contains("PageInstance:")){
-                        	instance_G=msg_G.replace("\n", "").replaceAll("\\[PageInstance:(.+?)\\].*", "$1");
-                        }
-                    }
-                    if(instance_expected.equals("") || instance_expected.equals("0") || instance_expected.equalsIgnoreCase("All Instance") || instance_G.equals("")){
-                    	if(StringUtils.isNoneBlank(rowIdStr_expected)){
-                    		if(rowID==null){
-                    			asiaFlag = true;//used for asia, for wrong setting RowID(For extendgrid)=1
-                    		}else{
-                    			if(!rowID.equals(rowIdStr_expected)){
-                   				 search = true;
-                    			}
-                    		}
-                    	}
-                    }else{
-                    	if(msg_G.toLowerCase().startsWith("[pageinstance")){
-                    		if(instance_expected.equalsIgnoreCase("Each Instance")){
-                    			if(instance_D.equalsIgnoreCase(instance_expected) || instance_G.equalsIgnoreCase(instance_expected)){
-                    				if(!msg_G.equalsIgnoreCase(ruleMsg_expected)){
-                    					search = true;
-                    				}
-                    			}
-                    		}else{
-                    			if(instance_expected.equalsIgnoreCase(instance_G)){
-                    				if(StringUtils.isNoneBlank(rowIdStr_expected) && rowID!=null){
-                    					if(!rowID.equals(rowIdStr_expected)){
-                    						search = true;
-                    					}
-                    				}else{
-                    					if((StringUtils.isBlank(rowIdStr_expected) && rowID!=null) || (StringUtils.isNotBlank(rowIdStr_expected) && rowID==null)){
-                    						search = true;
-                    						break;//break for fail
-                    					}
-                    				}
-                    			}else{search = true;}
-                    		}
-                    	}
-                    }
-
-                    if(!search && ( StringUtils.isBlank(rowIdStr_expected) ||  StringUtils.equals(rowID, rowIdStr_expected) || asiaFlag )){
-						row_expected.createCell(7).setCellValue(status_E);//column H
-						if(StringUtils.isNotBlank(msg_G)){
-							row_expected.createCell(9).setCellValue(msg_G);//column J
-						}
-						row_exported.createCell(19).setCellValue("c");// column T, add flag for checked row
-						rst=setValRuleCompareRst(status_expected,status_E,ruleMsg_expected,msg_G);
-						logger.info("Verify row:"+(i+1)+" "+rst);
-						row_expected.createCell(12).setCellValue(rst);//column M
-						if(rst.equals("fail")){flagStr="fail";}
-						break;
-                    }
-                    address1=findCell(sheet_exported,ruleTypeNo_expected,address1+1, 0, amt_exported,0); 
-				}
-				if(search || rst==null){
-					flagStr="fail";
-					logger.error("Verify row:"+(i+1)+" "+flagStr);
-					row_expected.createCell(7).setCellValue(flagStr);//column H
-					row_expected.createCell(12).setCellValue(flagStr);//column M
-					
-				}
-				
-				Runtime.getRuntime().gc();
-			}
-			//saved excels
-			ExcelUtil.saveWorkbook(file_expected, wb_expected);
-			ExcelUtil.saveWorkbook(file_exported, wb_exported);
-			
-			Sheet log_expected = null;
-			int uncheckederrNo=0;
-			String shortRuleType=null;
-			for(long i=1;i<=amt_exported;i++){//skip head row
-				row_exported=sheet_exported.getRow((int)i);
-				no_A=null;checked_T=null;status_E = null; //clear info
-				no_A=getCellValue_expected(row_exported,0);//column A
-				status_E=getCellValue_expected(row_exported,4);//column E
-				checked_T=getCellValue_expected(row_exported,19);//column T
-				//if(checked_T.equals("c")){row_exported.removeCell(row_exported.getCell(19));}
-				if(StringUtils.isNotBlank(no_A) && !checked_T.equals("c") && !status_E.equalsIgnoreCase("pass")){
-					msg_G = null; rowID = null; instance_D = null;//clear info
-					if(uncheckederrNo==0){
-						log_expected = wb_expected.createSheet(ewTestLog);
-						row_expected=log_expected.createRow(uncheckederrNo);
-						//set head row
-						String[] columnNames=new String[]{"CaseID(QC)","Check","RuleType","RuleID","Instance","RowID(For extendgrid)","Expected Status","Acctual Status","Expected Error","Acctual Error","Expected Cell Counts","Acctual Cell Counts","Test Result"};
-						for(int c=0;c<=12;c++){
-							row_expected.createCell(c).setCellValue(columnNames[c]);
-						}
-						log_expected.setAutoFilter(CellRangeAddress.valueOf("A1:M1"));
-					}else if(uncheckederrNo==1){
-						log_expected = wb_expected.getSheet(ewTestLog);
-					}
-					uncheckederrNo++;
-					row_expected=log_expected.createRow(uncheckederrNo);
-					//set value
-					shortRuleType=getShortRuleType(no_A);
-					msg_G=getCellValue_expected(row_exported,6);//column G
-					instance_D=getInstanceFromExportedExcel(msg_G);
-					rowID=getRowIDFromExportedExcel(msg_G);
-					row_expected.createCell(1).setCellValue("Y");//Check
-					row_expected.createCell(2).setCellValue(shortRuleType);//RuleType
-					row_expected.createCell(3).setCellValue(no_A.replaceAll(".*?(\\d+)", "$1"));//RuleID
-					
-					row_expected.createCell(4).setCellValue(instance_D);//Instance
-					row_expected.createCell(5).setCellValue(rowID);//RowID
-					row_expected.createCell(6).setCellValue(status_E);//Expected Status
-					row_expected.createCell(8).setCellValue(msg_G);//Expected Error
-				}
-			}
-			
-			//saved excels
-			ExcelUtil.saveWorkbook(file_expected, wb_expected);
-			ExcelUtil.saveWorkbook(file_exported, wb_exported);
-			
-		}
-		catch (Exception e)
-		{
-			logger.error(e.getMessage(),e);
-			flagStr="error\n"+e.getMessage();
-		}
-		Runtime.getRuntime().gc();
-		return flagStr;
-	}
 	public static String writeValidationRulesResult(String fileFullName_expected, String sheetName_expected,String fileFullName_exported)
 	{
 		String flagStr="pass";
@@ -843,21 +622,14 @@ public class ExcelUtil {
 					expected_obj.setNotes("actual CellName:"+cellID_of_cellInfo);//column G
 				}
 
-				if(actualValue_expected.equalsIgnoreCase(expectedValue_expected)){
-					expected_obj.setTestResult("pass");//column F testResult
-					logger.info("Verify row:"+(i+1)+" pass");
-				}else{
-					int days=ExcelUtil.compareDates(actualValue_expected, expectedValue_expected);
-					if(days==0){
-						expected_obj.setTestResult("pass");//column F testResult
-						expected_obj.setNotes("similiar date format:"+expectedValue_expected+" vs "+actualValue_expected);
-						logger.info("Verify row:"+(i+1)+" pass "+expectedValue_expected+" vs "+actualValue_expected);
-					}else{
-						expected_obj.setTestResult("fail");
-						logger.info("Verify row:"+(i+1)+" fail "+expectedValue_expected+" vs "+actualValue_expected);
-						flagStr="fail";
-					}
+
+				String[] resultArr=compareValue(String.valueOf(i+1),actualValue_expected,expectedValue_expected);
+				expected_obj.setTestResult(resultArr[0]);
+				expected_obj.setNotes(resultArr[1]);
+				if(resultArr[0].equalsIgnoreCase("fail")){
+					flagStr=resultArr[0];
 				}
+
 				i++;
 			}
 			
@@ -871,182 +643,7 @@ public class ExcelUtil {
 		}
 		return flagStr;
 	}	
-	
-	/***
-	 * wirte "export to excel" result, compare rows one by one
-	 * @param fileFullName_expected
-	 * @param sheetName_expected null, means first sheet
-	 * @param fileFullName_exported
-	 * @param csvUtil you need to create a new instance of CsvDBUtil before invoking this method
-	 * @return
-	 */
-	public static String writeExport2ExcelRst(String fileFullName_expected, String sheetName_expected,String fileFullName_exported,CsvDBUtil csvUtil){
-		String flagStr=null;
-		File file_expected=new File(fileFullName_expected);
-		File file_exported=new File(fileFullName_exported);
-		if(file_expected.exists() && file_expected.isFile()){
-			if(file_exported.exists() && file_exported.isFile()){
-				flagStr=writeExport2ExcelRst( file_expected,  sheetName_expected, file_exported, csvUtil);
-			}else{
-				flagStr="error: File Not Found "+fileFullName_exported;
-			}
-		}else{
-			flagStr="error: File Not Found "+fileFullName_expected;
-		}
-		return flagStr;
-	}
-	
-	/**
-	 * 
-	 * @param file_expected
-	 * @param sheetName_expected
-	 * @param file_exported
-	 * @param csvUtil
-	 * @return
-	 */
-	public static String writeExport2ExcelRst(File file_expected, String sheetName_expected,File file_exported,CsvDBUtil csvUtil)
-	{
-		String flagStr="pass";
-		int amt_expected = 0;
-		Workbook wb_expected, wb_exported;
-		InputStream inp_expected;
-		InputStream inp_exported;
-		FileOutputStream out_expected;
-		
-		try
-		{
-			inp_expected = new FileInputStream(file_expected);
-			wb_expected=WorkbookFactory.create(inp_expected);
-			inp_expected.close();
-			inp_exported = new FileInputStream(file_exported);
-			wb_exported=WorkbookFactory.create(inp_exported);
-			inp_exported.close();
-			logger.info("exported file(need to be checked):"+file_exported.toString());
-			logger.info("expected file:"+file_expected.toString());
-			Sheet sheet_expected = null, sheet_exported=null;
-			if (sheetName_expected != null)
-			{ sheet_expected = wb_expected.getSheet(sheetName_expected);}
-			if(sheet_expected==null)
-			{ sheet_expected = wb_expected.getSheetAt(0);}
-			amt_expected = getLastRowNum(wb_expected,sheetName_expected);
-			Row row_expected=null;
-			Cell cell_expected=null;
-			Cell cell_comments=null;
-			//part1 set expected info
-			String cellName_O_expected=null, cellName_expected = null, instance_expected = null, expectedValue_expected = null, actualValue_expected = null;
-			int rowId_expected = 0;
-			String rowIdStr_expected = null;//add rowStr for rowId is a string
-			//part2 set search info
-			String sheetName_of_cellInfo = null, colName_of_cellInfo = null, cellID_of_cellInfo = null, instance_of_cellInfo = null;
-			int rowId_of_cellInfo = 0;
-			List<String> cellInfo=null;
-			//part3
-			int amt_exported=0,rowIndex_exported,colIndex_exported;
-			String aNamedAddress=null;
-			logger.info("Verify row:1 skip head row (expectedValue vs actualValue)");
-			for(int i=1;i<=amt_expected;i++){
-				//clear setting
-				cell_comments=null;
-				//part1 set expected info
-				row_expected=sheet_expected.getRow(i);
-				if(row_expected==null)continue;
-				
-				//--
-				cellName_expected=getCellValue_expected(row_expected,0);//column A
-				cellName_O_expected=cellName_expected;
-				if(StringUtils.isBlank(cellName_expected)) continue;
-				cellName_expected=cellName_expected.replaceAll("^_{1,}(.*)", "$1");
-				rowIdStr_expected=getCellValue_expected(row_expected,1);//column B
-				rowId_expected = 0;
-				if(rowIdStr_expected.matches("[0-9]+")){
-					rowId_expected=Integer.parseInt(rowIdStr_expected);
-					rowIdStr_expected=null;
-				}
-				instance_expected=getCellValue_expected(row_expected,2);//column C
-				expectedValue_expected=getCellValue_expected(row_expected,3).trim();//column D
-				
-				//part 2
-				cellInfo=csvUtil.getCellInfo(cellName_expected, instance_expected);
-				if(cellInfo!=null && cellInfo.size()>0){
-					cellID_of_cellInfo=cellInfo.get(0);
-					sheetName_of_cellInfo=cellInfo.get(1);
-					instance_of_cellInfo=cellInfo.get(2);
-					rowId_of_cellInfo=Integer.parseInt(cellInfo.get(3));
-					colName_of_cellInfo=cellInfo.get(4);
-				}else{
-					logger.error("cannot find expected cell in "+csvUtil.getCsvPath()+csvUtil.getTableName()+".csv");
-					row_expected.createCell(5).setCellValue("fail to find this cell");//column F
-					flagStr="fail";
-					continue;
-				}
-				//part 3
-				if(rowId_expected>1){
-					rowId_of_cellInfo = rowId_of_cellInfo + rowId_expected - 1; // used for extend grid, calculate id of row by the first cell.
-				}
-				
-				if(StringUtils.isBlank(instance_of_cellInfo)){
-					sheet_exported=wb_exported.getSheet(sheetName_of_cellInfo);
-					amt_exported=getLastRowNum(wb_exported,sheetName_of_cellInfo);
-				}else{
-					String sheet_tmp=sheetName_of_cellInfo+"|"+instance_of_cellInfo;
-					sheet_exported=wb_exported.getSheet(sheet_tmp);
-					amt_exported=getLastRowNum(wb_exported,sheet_tmp);
-				}
-				
-				aNamedAddress="$"+colName_of_cellInfo+"$"+rowId_of_cellInfo; //$A$3
-				AreaReference[] arefs=AreaReference.generateContiguous(aNamedAddress);
-				CellReference crefs=arefs[0].getFirstCell();
-				rowIndex_exported=crefs.getRow();
-				colIndex_exported=crefs.getCol();
-				if(StringUtils.isNotBlank(rowIdStr_expected)){
-					rowIndex_exported=findCell(sheet_exported,rowIdStr_expected,rowIndex_exported,0,amt_exported,colIndex_exported);
-				}
-				if(rowIndex_exported<0){
-					logger.error("cannot find expected cell in "+csvUtil.getCsvPath()+csvUtil.getTableName()+".csv");
-					row_expected.createCell(5).setCellValue("fail to find this cell");//column F
-					flagStr="fail";
-					continue;
-				}
-				Row row_exported=sheet_exported.getRow(rowIndex_exported);
-				actualValue_expected=getCellValue_expected(row_exported,colIndex_exported);
-				cell_expected=getCell(row_expected, 4);//column E
-				cell_expected.setCellValue(actualValue_expected);
-				
-				cell_comments=getCell(row_expected, 6);//column G
-				if(cellID_of_cellInfo!=null && !cellID_of_cellInfo.equalsIgnoreCase(cellName_O_expected)){
-					cell_comments.setCellValue("actual CellName:"+cellID_of_cellInfo);
-				}
-				cell_expected=getCell(row_expected, 5);//column F
-				if(actualValue_expected.equalsIgnoreCase(expectedValue_expected)){
-					cell_expected.setCellValue("pass");
-					logger.info("Verify row:"+(i+1)+" pass");
-				}else{
-					int days=ExcelUtil.compareDates(actualValue_expected, expectedValue_expected);
-					if(days==0){
-						cell_expected.setCellValue("pass");
-						cell_comments.setCellValue("similiar date format:"+expectedValue_expected+" vs "+actualValue_expected);
-						logger.info("Verify row:"+(i+1)+" pass "+expectedValue_expected+" vs "+actualValue_expected);
-					}else{
-						cell_expected.setCellValue("fail");
-						logger.info("Verify row:"+(i+1)+" fail "+expectedValue_expected+" vs "+actualValue_expected);
-						flagStr="fail";
-					}
-				}
-				
-			}
-			//saved excel
-			out_expected = new FileOutputStream(file_expected);
-			wb_expected.write(out_expected);
-			out_expected.flush();
-			out_expected.close();
-		}
-		catch (Exception e)
-		{
-			logger.error(e.getMessage(),e);
-			flagStr="error\n"+e.getMessage();
-		}
-		return flagStr;
-	}
+
 	
 	public static Cell getCell(Row row, int colIndex){
 		Cell cell=null;
@@ -1099,32 +696,7 @@ public class ExcelUtil {
 		    }
 		return rowId;
 	}
-	/***
-	 * get a list of matching rows
-	 * @param list
-	 * @param searchcontent
-	 * @param startColumn
-	 * @param endColumn
-	 * @return
-	 */
-	public static Map<Integer,List<String>> findCell(List<List<String>> list,String searchcontent,int startColumn,int endColumn){
-		Map<Integer,List<String>> result=new HashMap<Integer,List<String>>();
-		List<String> row;
-		if(startColumn<0 ){startColumn=0;}
-		if(endColumn<0){endColumn=0;}
-		if(startColumn>endColumn){return result;}
-		for(int i=0;i<list.size();i++){
-			row=list.get(i);
-			if(startColumn>=row.size()){startColumn=row.size()-1;}
-			if(endColumn>=row.size()){endColumn=row.size()-1;}
-			for(int j=startColumn;j<=endColumn;j++){
-				if(StringUtils.equalsIgnoreCase(searchcontent, row.get(j))){
-					result.put(i, row);
-				}
-			}
-		}
-		return result;
-	}
+
 	/***
 	 * get a list of matching rows, match exported file version smaller than or equal to 1.16.1
 	 * @param list
@@ -1254,22 +826,7 @@ public class ExcelUtil {
 								FileUtil.writeContent(csvFH, nameInfo);
 								//logger.info(nameInfo);
 							}
-							/*for(Name cellName:allNames){
-								sheetName=cellName.getSheetName();
-								instance="";
-								if(sheetName.contains("|")){
-									String[] tmpArr=sheetName.split("\\|");
-									instance=tmpArr[1];
-									sheetName=tmpArr[0];
-								}
-								String formula=cellName.getRefersToFormula();
-								String[] formulaArr=formula.split("\\$");
-								columnRef=formulaArr[1];
-								rowRef=formulaArr[2];
-								nameInfo="\""+cellName.getNameName()+"\",\""+sheetName+"\",\""+instance+"\",\""+rowRef+"\",\""+columnRef+"\"\n";
-								FileUtil.writeContent(csvFH, nameInfo);
-								//logger.info(nameInfo);
-							}*/
+
 							flag=true;
 						}						
 					}
@@ -1333,21 +890,7 @@ public class ExcelUtil {
 				displayValue=cell.toString().trim();
 				break;
 		}
-		
-		/*if(cell.getCellType().equals(CellType.NUMERIC)){
-	    	
-	    	
-	    }else if(cell.getCellType().equals(CellType.STRING)){
-	    	
-	    }else if(cell.getCellType().equals(CellType.BOOLEAN)){
-	    	
-	    }else if(cell.getCellType().equals(CellType.FORMULA)){
-	    	
-	    }else if(cell.getCellType().equals(CellType.BLANK) || cell.getCellType().equals(CellType.ERROR)){
-	    	displayValue = "";
-	    }else{
-	    	displayValue=cell.toString().trim();
-	    }*/
+
 		return displayValue;
 	}
 	
@@ -1512,72 +1055,7 @@ public class ExcelUtil {
 			Runtime.getRuntime().gc();
 			return list;
 		}
-	/***
-	 * get objects from excel
-	 * @param excelFileStr excel's full path and name
-	 * @param sheetName excel's sheet name, if {sheetName} is null, {getLastOne} is true, get the last sheet; if {sheetName} is null, {getLastOne} is false, get the first sheet
-	 * @param getLastOne true get last sheet start with {sheetName} plus numbers, like ExportToCSV3, false get the sheet named {sheetName}
-	 * @param pojo
-	 * @return
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" }) 
-	public static <T> Iterator<T> getObjects1(String excelFileStr,String sheetName,Boolean getLastOne,Class pojo)
-	{
-		List<T> list = new ArrayList<T>(); 
-		Workbook xwb =null;
-		try
-		{
-			xwb =ExcelUtil.openWorkbook(new File(excelFileStr));
-			Sheet sheet = null;
-			if(StringUtils.isNotBlank(sheetName))
-			{
-				sheet=xwb.getSheet(sheetName);
-				if(getLastOne)
-				{
-					int lastIndex=xwb.getNumberOfSheets()-1;
-					for(int index=lastIndex;index>=0;index--)
-					{
-						String sheetNameTmp=xwb.getSheetName(index);
-						if(sheetNameTmp.equalsIgnoreCase(sheetName)){break;}
-						if(sheetNameTmp.startsWith(sheetName)){
-							String a=sheetNameTmp.substring(sheetName.length());
-							Pattern patern=Pattern.compile("\\d+");
-							Matcher isNum=patern.matcher(a);
-							if(isNum.matches())
-							{
-								sheet=xwb.getSheet(sheetNameTmp);
-								break;
-							}
-						}
-					}
-				}
-			}else{
-				if(getLastOne){
-					sheet=xwb.getSheetAt(xwb.getNumberOfSheets()-1);
-				}
-			}
-			if(sheet==null)
-			{sheet = xwb.getSheetAt(0);}
-			Row titleRow=sheet.getRow(0);
-			int rowNum=sheet.getLastRowNum();
-			for(int i=1;i<=rowNum;i++)
-			{
-				Row row=sheet.getRow(i);
-				if(row==null){continue;}
-				T form=(T)fromRowToBean(titleRow,row,pojo,null);
-				if(StringUtils.isNoneBlank(form.toString()))
-				{
-					list.add(form);
-				}
-			}
-			
-		}catch(Exception e)
-		{
-			System.out.println("data parsed error");  
-		}
-		Runtime.getRuntime().gc();
-		return list.iterator();
-	}
+
 /***
  * get objects from excel
  * @param excelFileStr excel's full path and name
@@ -2145,6 +1623,27 @@ public class ExcelUtil {
 		}
 		Runtime.getRuntime().gc();
 	}
-	
+
+	private static String[] compareValue(String rowId,String actual, String expected){
+		String[] ret=new String[2];
+		ret[0]="pass";//result
+		ret[1]=null;//notes
+		if(actual.equalsIgnoreCase(expected)){
+			logger.info("Verify row:"+rowId+" "+ret[0]);
+		}else{
+			int days=compareDates(actual,expected);
+			if(days==0){
+				ret[1]="similar date format:"+expected+" vs "+actual;
+			}else{
+				actual=actual.replaceAll("\\s","");
+				expected=expected.replaceAll("\\s","");
+				if(!actual.equalsIgnoreCase(expected)){
+					ret[0]="fail";
+				}
+			}
+			logger.info("Verify row:"+rowId+" "+ret[0]+" "+expected+" vs "+actual);
+		}
+		return ret;
+	}
 	
 }
