@@ -14,11 +14,18 @@ import com.lombardrisk.arproduct.utils.Helper;
 
 public class ExcelChecker  implements IFuncChecker{
 	private final static Logger logger = LoggerFactory.getLogger(ExcelChecker.class);
+	private String formInfo;
 	private String exec_DownloadFile;
 	private String exec_ExpectationFile;
 	private String executionStatus;
 	public ExcelChecker(){}
 	public ExcelChecker(String downloadFile,String expectation){
+		setFormInfo("");
+		setExec_DownloadFile(downloadFile);
+		setExec_ExpectationFile(expectation);
+	}
+	public ExcelChecker(String formInfo, String downloadFile,String expectation){
+		setFormInfo(formInfo);
 		setExec_DownloadFile(downloadFile);
 		setExec_ExpectationFile(expectation);
 	}
@@ -47,9 +54,12 @@ public class ExcelChecker  implements IFuncChecker{
 		this.executionStatus = executionStatus;
 	}
 	public Boolean checker(){
-		return checker(this.getExec_DownloadFile(),this.getExec_ExpectationFile());
+		return checker(this.getFormInfo(),this.getExec_DownloadFile(),this.getExec_ExpectationFile());
 	}
 	public Boolean checker(String exportedExcelFullName,String expectedExcelFullName){
+		return checker(this.getFormInfo(), exportedExcelFullName,expectedExcelFullName);
+	}
+	public Boolean checker(String formInfo, String exportedExcelFullName,String expectedExcelFullName){
 		logger.info("start checking exported excel");
 		if(!new File(exportedExcelFullName).isFile()){
 			setExecutionStatus("error: File Not Found "+exportedExcelFullName);
@@ -63,7 +73,7 @@ public class ExcelChecker  implements IFuncChecker{
 			//logger.info(csvUtil.printDuplicatedCells());
 			String log=csvUtil.printDuplicatedCells();
 			if(StringUtils.isBlank(log)){logger.info(log);}
-			String status=ExcelUtil.writeExport2ExcelResult(expectedExcelFullName,null,exportedExcelFullName,csvUtil);
+			String status=ExcelUtil.writeExport2ExcelResult(formInfo,expectedExcelFullName,null,exportedExcelFullName,csvUtil);
 			setExecutionStatus(status+System.getProperty("line.separator")+log);
 			if(status.startsWith("pass")){
 				flag=true;
@@ -99,5 +109,13 @@ public class ExcelChecker  implements IFuncChecker{
 			}
 		}
 		return stringBuffer.toString();
+	}
+
+	public String getFormInfo() {
+		return formInfo;
+	}
+
+	public void setFormInfo(final String formInfo) {
+		this.formInfo = formInfo;
 	}
 }
