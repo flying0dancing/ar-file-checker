@@ -9,4 +9,5 @@ public interface IFuncChecker {
 	public void setExecutionStatus(String executionStatus);
 	public Boolean checker();
 	public Boolean checker(String exportedExcelFullName,String expectedExcelFullName);
+	public Boolean checker(String formInfo, String exportedExcelFullName,String expectedExcelFullName);
 }

@@ -14,14 +14,22 @@ import com.lombardrisk.arproduct.utils.Helper;
 
 public class ValidationRuleChecker implements IFuncChecker{
 	private final static Logger logger = LoggerFactory.getLogger(ValidationRuleChecker.class);
+	private String formInfo;
 	private String exec_DownloadFile;
 	private String exec_ExpectationFile;
 	private String executionStatus;
 	public ValidationRuleChecker(){}
 	public ValidationRuleChecker(String downloadFile,String expectation){
+		setFormInfo("");
 		setExec_DownloadFile(downloadFile);
 		setExec_ExpectationFile(expectation);
-		
+
+	}
+	public ValidationRuleChecker(String formInfo, String downloadFile,String expectation){
+		setFormInfo(formInfo);
+		setExec_DownloadFile(downloadFile);
+		setExec_ExpectationFile(expectation);
+
 	}
 	public String getExec_DownloadFile() {
 		return exec_DownloadFile;
@@ -44,16 +52,20 @@ public class ValidationRuleChecker implements IFuncChecker{
 	}	
 	
 	public Boolean checker(){
-		return checker(this.getExec_DownloadFile(),this.getExec_ExpectationFile());
+		return checker(this.getFormInfo(), this.getExec_DownloadFile(),this.getExec_ExpectationFile());
 	}
-	
+
 	public Boolean checker(String exportedExcelFullName,String expectedExcelFullName){
+		return checker(this.getFormInfo(), exportedExcelFullName, expectedExcelFullName);
+	}
+
+	public Boolean checker(String formInfo, String exportedExcelFullName,String expectedExcelFullName){
 		logger.info("start checking validation rule");
 		if(!new File(exportedExcelFullName).isFile()){
 			setExecutionStatus("error: File Not Found "+exportedExcelFullName);
 			return false;
 		}
-		String status=ExcelUtil.writeValidationRulesResult(expectedExcelFullName,null,exportedExcelFullName);
+		String status=ExcelUtil.writeValidationRulesResult(formInfo, expectedExcelFullName,null,exportedExcelFullName);
 		setExecutionStatus(status);
 		Boolean flag=false;
 		if(status.startsWith("pass")){
@@ -86,5 +98,12 @@ public class ValidationRuleChecker implements IFuncChecker{
 		}
 		return stringBuffer.toString();
 	}
-	
+
+	public String getFormInfo() {
+		return formInfo;
+	}
+
+	public void setFormInfo(final String formInfo) {
+		this.formInfo = formInfo;
+	}
 }

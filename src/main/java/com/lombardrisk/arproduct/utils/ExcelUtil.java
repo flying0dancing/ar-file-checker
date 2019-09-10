@@ -203,7 +203,7 @@ public class ExcelUtil {
 		return str;
 	}
 
-	public static String writeValidationRulesResult(String fileFullName_expected, String sheetName_expected,String fileFullName_exported)
+	public static String writeValidationRulesResult(String logPrefix, String fileFullName_expected, String sheetName_expected,String fileFullName_exported)
 	{
 		String flagStr="pass";
 		Workbook wb_expected;
@@ -273,7 +273,7 @@ public class ExcelUtil {
 				ruleType_expected=getCellValue_expected(row_expected,2);//column C
 				ruleTypeNo_expected=getFullRuleNo(ruleType_expected,ruleNo_expected);
 				if(ruleTypeNo_expected==null && exportedFileV.equals("1.16.1")){
-					logger.error("Verify row:"+(i+1)+" fail to find this Rule Type, should be any of Val, XVal, UVal, UXVal, Cross-Val");
+					logger.error(logPrefix+" Verify row:"+(i+1)+" fail to find this Rule Type, should be any of Val, XVal, UVal, UXVal, Cross-Val");
 					row_expected.createCell(7).setCellValue("fail to find this Rule Type, should be any of Val, XVal, UVal, UXVal, Cross-Val");//column H
 					row_expected.createCell(12).setCellValue("fail to find this Rule Type, should be any of Val, XVal, UVal, UXVal, Cross-Val");//column M
 					flagStr="fail";
@@ -293,7 +293,7 @@ public class ExcelUtil {
 				
 				entries = addresses.entrySet().iterator(); 
 				if(addresses==null || addresses.size()<=0){
-					logger.error("Verify row:"+(i+1)+" fail to find");
+					logger.error(logPrefix+" Verify row:"+(i+1)+" fail to find");
 					row_expected.createCell(7).setCellValue("fail to find");//column H
 					row_expected.createCell(12).setCellValue("fail to find");//column M
 					flagStr="fail";
@@ -371,16 +371,19 @@ public class ExcelUtil {
 						row_exported.add("checkedForValidation");//add flag at column U for checked row
 						list_exported.set(map.getKey(), row_exported);//add flag at column U for checked row
 						rst=setValRuleCompareRst(status_expected,status_E,ruleMsg_expected,msg_G);
-						logger.info("Verify row:"+(i+1)+" "+rst);
+						//logger.info(logPrefix+" Verify row:"+(i+1)+" "+rst);
 						row_expected.createCell(12).setCellValue(rst);//column M
-						if(rst.equals("fail")){flagStr="fail";}
+						if(rst.equals("fail")){
+							flagStr="fail";
+							logger.info(logPrefix+" Verify row:"+(i+1)+" "+rst);
+						}
 						break;
                     }
                     
 				}
 				if(search || rst==null){
 					flagStr="fail";
-					logger.error("Verify row:"+(i+1)+" "+flagStr);
+					logger.error(logPrefix+" Verify row:"+(i+1)+" "+flagStr);
 					row_expected.createCell(7).setCellValue(flagStr);//column H
 					row_expected.createCell(12).setCellValue(flagStr);//column M
 				}
@@ -509,7 +512,7 @@ public class ExcelUtil {
 	 * @param csvUtil
 	 * @return
 	 */
-	public static String writeExport2ExcelResult(String fileFullName_expected, String sheetName_expected,String fileFullName_exported,CsvDBUtil csvUtil)
+	public static String writeExport2ExcelResult(String logPrefix, String fileFullName_expected, String sheetName_expected,String fileFullName_exported,CsvDBUtil csvUtil)
 	{
 		String flagStr="pass";
 		Workbook  wb_exported;
@@ -579,7 +582,7 @@ public class ExcelUtil {
 					rowId_of_cellInfo=Integer.parseInt(cellInfo.get(3));
 					colName_of_cellInfo=cellInfo.get(4);
 				}else{
-					logger.error("Verify row:"+(i+1)+" cannot find expected cell info");
+					logger.error(logPrefix+" Verify row:"+(i+1)+" cannot find expected cell info");
 					expected_obj.setTestResult("fail to find this cell");//column F testResult
 					flagStr="fail";
 					i++;
@@ -608,7 +611,7 @@ public class ExcelUtil {
 					rowIndex_exported=findCell(sheet_exported,rowIdStr_expected,rowIndex_exported,0,amt_exported,colIndex_exported);
 				}
 				if(rowIndex_exported<0){
-					logger.error("Verify row:"+(i+1)+" cannot find exported cell info");
+					logger.error(logPrefix+" Verify row:"+(i+1)+" cannot find exported cell info");
 					expected_obj.setTestResult("fail to find this cell");//column F testResult
 					flagStr="fail";
 					i++;
@@ -623,7 +626,7 @@ public class ExcelUtil {
 				}
 
 
-				String[] resultArr=compareValue(String.valueOf(i+1),actualValue_expected,expectedValue_expected);
+				String[] resultArr=compareValue(logPrefix,String.valueOf(i+1),actualValue_expected,expectedValue_expected);
 				expected_obj.setTestResult(resultArr[0]);
 				expected_obj.setNotes(resultArr[1]);
 				if(resultArr[0].equalsIgnoreCase("fail")){
@@ -1624,12 +1627,12 @@ public class ExcelUtil {
 		Runtime.getRuntime().gc();
 	}
 
-	private static String[] compareValue(String rowId,String actual, String expected){
+	private static String[] compareValue(String logPrefix, String rowId,String actual, String expected){
 		String[] ret=new String[2];
 		ret[0]="pass";//result
 		ret[1]=null;//notes
 		if(actual.equalsIgnoreCase(expected)){
-			logger.info("Verify row:"+rowId+" "+ret[0]);
+			//logger.info(logPrefix+" Verify row:"+rowId+" "+ret[0]);
 		}else{
 			int days=compareDates(actual,expected);
 			if(days==0){
@@ -1641,7 +1644,7 @@ public class ExcelUtil {
 					ret[0]="fail";
 				}
 			}
-			logger.info("Verify row:"+rowId+" "+ret[0]+" "+expected+" vs "+actual);
+			logger.info(logPrefix+" Verify row:"+rowId+" "+ret[0]+" "+expected+" vs "+actual);
 		}
 		return ret;
 	}
