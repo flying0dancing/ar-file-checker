@@ -1,6 +1,7 @@
 package com.lombardrisk.arproduct.utils;
 
 import com.lombardrisk.arproduct.poi.ExcelXlsxReader;
+import com.lombardrisk.arproduct.pojo.ExportToVal;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -11,8 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 public class ValidationRuleUtil {
@@ -447,5 +451,28 @@ public class ValidationRuleUtil {
             if(flag)break;
         }
         return rowId;
+    }
+
+    private void transferToObject(List<List<String>> list_exported){
+        List<ExportToVal> obj_exported=new ArrayList<ExportToVal>();
+        int ruleType_colIndex,id_colIndex,level_colIndex,Status_colIndex,message_colIndex;
+        int startRow=1;
+        String exportedFileV="1.16.1";
+        if(list_exported.get(0).get(0).equalsIgnoreCase("Rule Type")){
+            //validation rules' export file are updated. started from agile reporter v1.16.2
+            exportedFileV="1.16.2";
+        }
+        if(list_exported.get(0).get(0).equalsIgnoreCase("FILTER CRITERIA")){
+            //validation rules' export file are updated. started from agile reporter v19.3
+            exportedFileV="19.3";
+            startRow=3;//have a empty row in index 3, ignore it
+        }
+        for(int i=startRow;i<list_exported.size();i++){
+
+        }
+
+
+    
+
     }
 }
