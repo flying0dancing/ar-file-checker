@@ -6,7 +6,7 @@ public class ExportToVal {
     private String level;
     private String instances;
     private String status;
-    private String messageOrDetails;
+    private String message;
     private String checkStatus;
     private String arVersion;
     private int rowIndex;
@@ -51,14 +51,6 @@ public class ExportToVal {
         this.status = status;
     }
 
-    public String getMessageOrDetails() {
-        return messageOrDetails;
-    }
-
-    public void setMessageOrDetails(final String messageOrDetails) {
-        this.messageOrDetails = messageOrDetails;
-    }
-
     public String getCheckStatus() {
         return checkStatus;
     }
@@ -81,5 +73,13 @@ public class ExportToVal {
 
     public void setRowIndex(final int rowIndex) {
         this.rowIndex = rowIndex;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(final String message) {
+        this.message = message;
     }
 }

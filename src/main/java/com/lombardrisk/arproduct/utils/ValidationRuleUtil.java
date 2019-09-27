@@ -453,21 +453,61 @@ public class ValidationRuleUtil {
         return rowId;
     }
 
+    private int getIndexOfColumn(List<String> headRow, String headStr){
+        int i=0;
+        String content;
+        for(;i<headRow.size();i++){
+            content=headRow.get(i);
+            if(content.equalsIgnoreCase(headStr) || content.toLowerCase().contains(headStr.toLowerCase())){
+                break;
+            }
+        }
+        return i;
+    }
     private void transferToObject(List<List<String>> list_exported){
         List<ExportToVal> obj_exported=new ArrayList<ExportToVal>();
-        int ruleType_colIndex,id_colIndex,level_colIndex,Status_colIndex,message_colIndex;
+        List<String> headRow;
+        int ruleType_colIndex=0,id_colIndex=0,level_colIndex=1,Status_colIndex=4,message_colIndex=6;
         int startRow=1;
         String exportedFileV="1.16.1";
+        headRow=list_exported.get(0);
+        if(list_exported.get(0).get(0).equalsIgnoreCase("No")){
+            id_colIndex=getIndexOfColumn(headRow, "No");
+        }
         if(list_exported.get(0).get(0).equalsIgnoreCase("Rule Type")){
             //validation rules' export file are updated. started from agile reporter v1.16.2
             exportedFileV="1.16.2";
+            ruleType_colIndex=0;//column A
+            id_colIndex=1;//column B
+            level_colIndex=2;//column C
+            Status_colIndex=5;//column F
+            message_colIndex=7;//column H
         }
         if(list_exported.get(0).get(0).equalsIgnoreCase("FILTER CRITERIA")){
             //validation rules' export file are updated. started from agile reporter v19.3
             exportedFileV="19.3";
+            headRow=list_exported.get(2);//have a empty row in index 3, ignore it
             startRow=3;//have a empty row in index 3, ignore it
+            ruleType_colIndex=4;//column E
+            id_colIndex=3;//column D
+            level_colIndex=1;//column B
+            Status_colIndex=0;//column A
+            message_colIndex=2;//column C
         }
+        ExportToVal exportToValRule =new ExportToVal();
+        List<String> row_exported;
+        String shortRuleType;
+        String ruleId
+        String no_A=null,status_E = null, msg_G = null, rowID = null,instance_D = null, checked_T=null,rst=null, instance_G;//in exported file
         for(int i=startRow;i<list_exported.size();i++){
+            row_exported=list_exported.get(i);
+            if(exportedFileV.equals("1.16.2")){
+                shortRuleType=getShortRuleType(row_exported.get(ruleType_colIndex)); //RuleType
+                ruleId=row_exported.get(ruleType_colIndex).replaceAll(".*?(\\d+)", "$1"); //RuleID
+            }else{
+                shortRuleType=row_exported.get(ruleType_colIndex).replaceAll("Reg ", ""); //RuleType
+            }
+
 
         }
 
