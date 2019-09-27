@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import com.lombardrisk.arproduct.utils.ValidationRuleUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +66,7 @@ public class ValidationRuleChecker implements IFuncChecker{
 			setExecutionStatus("error: File Not Found "+exportedExcelFullName);
 			return false;
 		}
-		String status=ExcelUtil.writeValidationRulesResult(formInfo, expectedExcelFullName,null,exportedExcelFullName);
+		String status=ValidationRuleUtil.writeValidationRulesResult(formInfo, expectedExcelFullName,null,exportedExcelFullName);
 		setExecutionStatus(status);
 		Boolean flag=false;
 		if(status.startsWith("pass")){
