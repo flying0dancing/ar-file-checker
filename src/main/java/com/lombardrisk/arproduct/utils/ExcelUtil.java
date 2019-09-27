@@ -512,6 +512,9 @@ public class ExcelUtil {
 					} else if (dataFormatStr.contains("#,##0.00") && dataFormatStr.contains("%")) {
 						displayValue =
 								formatter.formatRawCellContents(numericCellVal, dataIndex, "#,##0.00;-#,##0.00").trim()+"%";
+					} else if (dataFormatStr.contains("#,##0") && dataFormatStr.contains("%")) {
+						displayValue =
+								formatter.formatRawCellContents(numericCellVal, dataIndex, "#,##0;-#,##0").trim()+"%";
 					}else{
 						displayValue = formatter.formatRawCellContents(numericCellVal,dataIndex,dataFormatStr).trim();
 					}
