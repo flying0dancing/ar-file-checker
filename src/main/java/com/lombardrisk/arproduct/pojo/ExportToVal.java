@@ -5,6 +5,7 @@ public class ExportToVal {
     private String id;
     private String level;
     private String instances;
+    private String extendGridId;
     private String status;
     private String message;
     private String checkStatus;
@@ -81,5 +82,13 @@ public class ExportToVal {
 
     public void setMessage(final String message) {
         this.message = message;
+    }
+
+    public String getExtendGridId() {
+        return extendGridId;
+    }
+
+    public void setExtendGridId(final String extendGridId) {
+        this.extendGridId = extendGridId;
     }
 }

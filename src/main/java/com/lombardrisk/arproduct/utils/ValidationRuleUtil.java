@@ -458,61 +458,93 @@ public class ValidationRuleUtil {
         String content;
         for(;i<headRow.size();i++){
             content=headRow.get(i);
-            if(content.equalsIgnoreCase(headStr) || content.toLowerCase().contains(headStr.toLowerCase())){
+            if(content.equalsIgnoreCase(headStr) ){
                 break;
             }
         }
         return i;
     }
-    private void transferToObject(List<List<String>> list_exported){
+    private List<ExportToVal> transferToObject(List<List<String>> list_exported){
         List<ExportToVal> obj_exported=new ArrayList<ExportToVal>();
         List<String> headRow;
-        int ruleType_colIndex=0,id_colIndex=0,level_colIndex=1,Status_colIndex=4,message_colIndex=6;
-        int startRow=1;
-        String exportedFileV="1.16.1";
-        headRow=list_exported.get(0);
+        int ruleType_colIndex,id_colIndex,level_colIndex,Status_colIndex,message_colIndex;
+        int startRow=3;
+        String exportedFileV="19.3";
+        //validation rules' export file are updated. started from agile reporter v19.3
+        headRow=list_exported.get(2);//have a empty row in index 3, ignore it
+        ruleType_colIndex=getIndexOfColumn(headRow,"Rule Type");//column E
+        id_colIndex=getIndexOfColumn(headRow,"id");//column D
+        level_colIndex=getIndexOfColumn(headRow,"level");//column B
+        Status_colIndex=getIndexOfColumn(headRow,"status");//column A
+        message_colIndex=getIndexOfColumn(headRow,"details");//column C
         if(list_exported.get(0).get(0).equalsIgnoreCase("No")){
-            id_colIndex=getIndexOfColumn(headRow, "No");
+            exportedFileV="1.16.1";
+            startRow=1;
+            headRow=list_exported.get(0);
+            id_colIndex=getIndexOfColumn(headRow, "No"); //column A
+            level_colIndex=getIndexOfColumn(headRow,"level");//column B
+            Status_colIndex=getIndexOfColumn(headRow,"status");//column E
+            message_colIndex=getIndexOfColumn(headRow,"message");;//column G
         }
         if(list_exported.get(0).get(0).equalsIgnoreCase("Rule Type")){
             //validation rules' export file are updated. started from agile reporter v1.16.2
             exportedFileV="1.16.2";
-            ruleType_colIndex=0;//column A
-            id_colIndex=1;//column B
-            level_colIndex=2;//column C
-            Status_colIndex=5;//column F
-            message_colIndex=7;//column H
+            startRow=1;
+            headRow=list_exported.get(0);
+            ruleType_colIndex=getIndexOfColumn(headRow,"Rule Type");//column A
+            id_colIndex=getIndexOfColumn(headRow,"id");//column B
+            level_colIndex=getIndexOfColumn(headRow,"level");//column C
+            Status_colIndex=getIndexOfColumn(headRow,"status");//column F
+            message_colIndex=getIndexOfColumn(headRow,"message");;//column H
         }
-        if(list_exported.get(0).get(0).equalsIgnoreCase("FILTER CRITERIA")){
-            //validation rules' export file are updated. started from agile reporter v19.3
-            exportedFileV="19.3";
-            headRow=list_exported.get(2);//have a empty row in index 3, ignore it
-            startRow=3;//have a empty row in index 3, ignore it
-            ruleType_colIndex=4;//column E
-            id_colIndex=3;//column D
-            level_colIndex=1;//column B
-            Status_colIndex=0;//column A
-            message_colIndex=2;//column C
-        }
-        ExportToVal exportToValRule =new ExportToVal();
+
+
+
+        ExportToVal exportToValRule =null;
         List<String> row_exported;
         String shortRuleType;
-        String ruleId
-        String no_A=null,status_E = null, msg_G = null, rowID = null,instance_D = null, checked_T=null,rst=null, instance_G;//in exported file
+        String ruleId;
+        String msg_G = null, rowID = null,instance_G= "All Instance";//in exported file
         for(int i=startRow;i<list_exported.size();i++){
             row_exported=list_exported.get(i);
-            if(exportedFileV.equals("1.16.2")){
-                shortRuleType=getShortRuleType(row_exported.get(ruleType_colIndex)); //RuleType
-                ruleId=row_exported.get(ruleType_colIndex).replaceAll(".*?(\\d+)", "$1"); //RuleID
+            if(StringUtils.isBlank(row_exported.get(0))){
+                continue;
+            }
+            exportToValRule =new ExportToVal();
+            exportToValRule.setRowIndex(i);
+            exportToValRule.setLevel(row_exported.get(level_colIndex));
+            exportToValRule.setStatus(row_exported.get(Status_colIndex));
+            msg_G=row_exported.get(message_colIndex);
+
+            if(exportedFileV.equals("1.16.1")){
+                shortRuleType=getShortRuleType(row_exported.get(id_colIndex)); //RuleType
+                ruleId=row_exported.get(id_colIndex).replaceAll(".*?(\\d+)", "$1"); //RuleID
             }else{
                 shortRuleType=row_exported.get(ruleType_colIndex).replaceAll("Reg ", ""); //RuleType
+                ruleId=row_exported.get(id_colIndex);
             }
+            exportToValRule.setType(shortRuleType);
+            exportToValRule.setId(ruleId);
 
-
+            if(StringUtils.isNotBlank(msg_G)){
+                if(msg_G.contains("Row:")){
+                    rowID=msg_G.replace("\n", "").replaceAll(".*\\[Row:(.+?)\\].*", "$1");
+                }
+                if( msg_G.contains("PageInstance:")){
+                    instance_G=msg_G.replace("\n", "").replaceAll("\\[PageInstance:(.+?)\\].*", "$1");
+                }
+                if(msg_G.contains("Message: N/A")){
+                    msg_G="";
+                }
+                if(msg_G.startsWith("Message: ")){
+                    msg_G=msg_G.replaceFirst("Message: ","");
+                }
+            }
+            exportToValRule.setMessage(msg_G);
+            exportToValRule.setInstances(instance_G);
+            exportToValRule.setExtendGridId(rowID);
+            obj_exported.add(exportToValRule);
         }
-
-
-    
-
+       return obj_exported;
     }
 }
