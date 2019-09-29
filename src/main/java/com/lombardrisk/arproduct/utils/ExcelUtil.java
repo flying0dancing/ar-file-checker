@@ -509,16 +509,11 @@ public class ExcelUtil {
 					if (dataFormatStr.contains("#,##0_)")) {
 						displayValue =
 								formatter.formatRawCellContents(numericCellVal, dataIndex, "#,##0;-#,##0").trim();
-					} else if (dataFormatStr.contains("#,##0.00") && dataFormatStr.contains("%")) {
+					} else if (dataFormatStr.contains("\"%\"")) {
+						dataFormatStr=dataFormatStr.replace("\"%\"","");
 						displayValue =
-								formatter.formatRawCellContents(numericCellVal, dataIndex, "#,##0.00;-#,##0.00").trim()+"%";
-					}  else if (dataFormatStr.contains("#0.0") && dataFormatStr.contains("%")) {
-						displayValue =
-								formatter.formatRawCellContents(numericCellVal, dataIndex, "#0.0;-#0.0").trim()+"%";
-					} else if (dataFormatStr.contains("#,##0") && dataFormatStr.contains("%")) {
-						displayValue =
-								formatter.formatRawCellContents(numericCellVal, dataIndex, "#,##0;-#,##0").trim()+"%";
-					}else{
+								formatter.formatRawCellContents(numericCellVal, dataIndex, dataFormatStr).trim()+"%";
+					} else{
 						displayValue = formatter.formatRawCellContents(numericCellVal,dataIndex,dataFormatStr).trim();
 					}
 
