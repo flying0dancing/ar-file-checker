@@ -47,4 +47,16 @@ public class MAS_ExportedExcel_ARPA202_Test
         assertTrue( flag );
     }
 
+    public void testHKMA0929() throws Exception
+    {
+        System.out.println("love");
+        String downloadFile=downPath+"MAS_0002_MAS1111_v1_20181231.xlsx";
+        String expectation=expectedPath+"MAS1111_V1_0001_20190731_ExcelDisplay.xlsx";
+
+        String log="";
+        ExcelChecker achecker=new ExcelChecker( downloadFile, expectation);
+        Boolean flag=achecker.checker(downloadFile, expectation);
+        assertTrue( flag );
+    }
+
 }
