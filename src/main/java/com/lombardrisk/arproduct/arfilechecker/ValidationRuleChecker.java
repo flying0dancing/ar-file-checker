@@ -66,7 +66,10 @@ public class ValidationRuleChecker implements IFuncChecker{
 			setExecutionStatus("error: File Not Found "+exportedExcelFullName);
 			return false;
 		}
-		String status=ValidationRuleUtil.writeValidationRulesResult(formInfo, expectedExcelFullName,null,exportedExcelFullName);
+		String status=ValidationRuleUtil.fileNotExists(expectedExcelFullName,exportedExcelFullName);
+		if(status.equals("")){
+			status=ValidationRuleUtil.writeValidationRulesResult(formInfo, expectedExcelFullName,null,exportedExcelFullName);
+		}
 		setExecutionStatus(status);
 		Boolean flag=false;
 		if(status.startsWith("pass")){

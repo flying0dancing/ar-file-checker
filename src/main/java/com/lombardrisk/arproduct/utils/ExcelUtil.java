@@ -339,46 +339,7 @@ public class ExcelUtil {
 		return rowId;
 	}
 
-	/***
-	 * get a list of matching rows, match exported file version smaller than or equal to 1.16.1
-	 * @param list
-	 * @param searchcontent
-	 * @return
-	 */
-	public static Map<Integer,List<String>> findCell(List<List<String>> list,String searchcontent){
-		Map<Integer,List<String>> result=new HashMap<Integer,List<String>>();
-		List<String> row;
-		for(int i=0;i<list.size();i++){
-			row=list.get(i);
-			if(StringUtils.equalsIgnoreCase(searchcontent, row.get(0))){
-				result.put(i, row);
-			}
-		}
-		return result;
-	}
-	/**
-	 * get a list of matching rows, match exported file version larger than 1.16.2
-	 * @param list
-	 * @param searchRuleType
-	 * @param searchId
-	 * @return
-	 */
-	public static Map<Integer,List<String>> findCell(List<List<String>> list,String searchRuleType,int IndexOfRuleType,String searchId,int IndexOfSearchId){
-		Map<Integer,List<String>> result=new HashMap<Integer,List<String>>();
-		List<String> row;
 
-		for(int i=0;i<list.size();i++){
-			row=list.get(i);
-			int rowSize=row.size();
-			if(rowSize<IndexOfRuleType || rowSize<IndexOfSearchId){
-				continue;
-			}
-			if(StringUtils.equalsIgnoreCase("Reg "+searchRuleType, row.get(IndexOfRuleType)) && searchId.equalsIgnoreCase(row.get(IndexOfSearchId))){
-				result.put(i, row);
-			} 
-		}
-		return result;
-	}
 	/***
 	 * get the cell's display value
 	 * @param row
