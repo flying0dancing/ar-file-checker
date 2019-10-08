@@ -114,5 +114,18 @@ public class MAS_ValidationRules_ARPA214_Test
         Boolean flag=achecker.checker();
         assertTrue( flag );
     }
+
+    public void testRule6() throws Exception
+    {
+        //version 19.3
+        System.out.println("love1");
+        String downloadFile=downPath+"FC_v1_0002_31122018_HKMA_0002_DS_v0_20200731_Validation.xlsx";
+        String expectation=expectedPath+"FC_v1_ValidationResult(1).xlsx";
+
+        String log="";
+        ValidationRuleChecker achecker=new ValidationRuleChecker( downloadFile, expectation);
+        Boolean flag=achecker.checker();
+        assertTrue( flag );
+    }
    
 }

@@ -169,7 +169,7 @@ public class ValidationRuleUtil {
 
             }
 
-            flagStr=writeExpectedLogSheet(wb_expected,ewTestLog,list_exported,objs_exported, comparedRowCount);
+            flagStr=writeExpectedLogSheet(wb_expected,ewTestLog,list_exported,objs_exported, comparedRowCount,flagStr);
             //saved excels
             ExcelUtil.saveWorkbook(file_expected, wb_expected);
             String name=Helper.getFileNameWithoutSuffix(fileFullName_exported);
@@ -206,8 +206,8 @@ public class ValidationRuleUtil {
         return search;
     }
 
-    protected static String writeExpectedLogSheet(final Workbook wb_expected,final String ewTestLog,final List<List<String>> list_exported,final List<ExportToVal> objs_exported,final int comparedRowCount){
-        String flagStr="pass";
+    protected static String writeExpectedLogSheet(final Workbook wb_expected,final String ewTestLog,final List<List<String>> list_exported,final List<ExportToVal> objs_exported,final int comparedRowCount,String flagStr){
+
         Row row_expected=null;
         List<String> row_exported;
         ExportToVal row_exportedObj;
