@@ -394,17 +394,17 @@ public class ValidationRuleUtil {
             exportToValRule.setId(ruleId);
 
             if(StringUtils.isNotBlank(msg_G)){
-                if(msg_G.contains("Row:")){
-                    rowID=msg_G.replace("\n", "").replaceAll(".*\\[Row:(.+?)\\].*", "$1");
-                }
-                if( msg_G.contains("PageInstance:")){
-                    instance_G=msg_G.replace("\n", "").replaceAll("\\[PageInstance:(.+?)\\].*", "$1");
-                }
                 if(msg_G.contains("Message: N/A")){
                     msg_G="";
                 }
                 if(msg_G.startsWith("Message: ")){
                     msg_G=msg_G.replaceFirst("Message: ","");
+                }
+                if(msg_G.contains("Row:")){
+                    rowID=msg_G.replace("\n", "").replaceAll(".*\\[Row:(.+?)\\].*", "$1");
+                }
+                if( msg_G.contains("PageInstance:")){
+                    instance_G=msg_G.replace("\n", "").replaceAll("\\[PageInstance:(.+?)\\].*", "$1");
                 }
             }
             exportToValRule.setMessage(msg_G);
