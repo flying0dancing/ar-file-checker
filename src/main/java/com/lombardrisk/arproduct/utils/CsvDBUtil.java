@@ -67,7 +67,7 @@ public class CsvDBUtil {
 		//TODO
 		Boolean allInstanceNull=false;
 		List<String> instances=null;
-		String sql="select distinct \"Instance\" from \""+tableName+"\" where \"CellName\" like '%"+cellName_expected+"'";;
+		String sql="select distinct \"Instance\" from \""+tableName+"\" where \"CellName\" like '%"+cellName_expected+"'";
 		instances=dbHelper.queryRecords(sql);
 			/*if(instances!=null && instances.size()>0){
 				int instanceAllNull_i = 0;

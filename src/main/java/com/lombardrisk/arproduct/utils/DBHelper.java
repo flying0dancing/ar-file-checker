@@ -213,18 +213,12 @@ public class DBHelper {
 		{
 			rst=new ArrayList<String>();
 			ResultSet rs = null;
-			Statement stmt = getConn().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+			Statement stmt = getConn().createStatement();
 			rs = stmt.executeQuery(sql);
 			ResultSetMetaData rsmd = rs.getMetaData();
 			while (rs.next())
 			{
-				String type = rsmd.getColumnClassName(1).toString();
-				if (type.equals("oracle.jdbc.OracleClob"))
-					rst.add(rs.getClob(1).getSubString((long) 1, (int) rs.getClob(1).length()));
-				else if (type.equals("java.math.BigDecimal"))
-					rst.add(String.valueOf(rs.getBigDecimal(1)));
-				else
-					rst.add(rs.getString(1));
+				rst.add(rs.getString(1));
 			}
 		}
 		catch(IndexOutOfBoundsException e)
@@ -257,29 +251,20 @@ public class DBHelper {
 		List<List<String>> rst =null;
 		try
 		{
-			
 			ResultSet rs = null;
-			Statement stmt = getConn().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+			Statement stmt = getConn().createStatement();
 			rs = stmt.executeQuery(sql);
-			if(rs.isBeforeFirst()){
-				rst=new ArrayList<List<String>>();
-				List<String> rowRecord=null;
-				ResultSetMetaData rsmd = rs.getMetaData();
-				int countOfColumn=rsmd.getColumnCount();
-				while (rs.next() && countOfColumn>0)
-				{
-					rowRecord=new ArrayList<String>();
-					for(int col=1;col<=countOfColumn;col++){
-						String type = rsmd.getColumnClassName(col).toString();
-						if (type.equals("oracle.jdbc.OracleClob"))
-							rowRecord.add(rs.getClob(col).getSubString((long) 1, (int) rs.getClob(col).length()));
-						else if (type.equals("java.math.BigDecimal"))
-							rowRecord.add(String.valueOf(rs.getBigDecimal(col)));
-						else
-							rowRecord.add(rs.getString(col));
-					}
-					rst.add(rowRecord);
+			rst=new ArrayList<List<String>>();
+			List<String> rowRecord=null;
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int countOfColumn=rsmd.getColumnCount();
+			while (rs.next() && countOfColumn>0)
+			{
+				rowRecord=new ArrayList<String>();
+				for(int col=1;col<=countOfColumn;col++){
+					rowRecord.add(rs.getString(col));
 				}
+				rst.add(rowRecord);
 			}
 		}
 		catch(IndexOutOfBoundsException e)
