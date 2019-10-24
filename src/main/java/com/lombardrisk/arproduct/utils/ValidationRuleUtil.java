@@ -218,12 +218,13 @@ public class ValidationRuleUtil {
         Sheet log_expected = null;
         int uncheckederrNo=0;
         if(comparedRowCount<amt_exported){
-            Set<String> logStatusSet=new TreeSet<>();
             for(int i=0;i<objs_exported.size();i++){
                 row_exportedObj=objs_exported.get(i);
                 if(StringUtils.isBlank(row_exportedObj.getCheckStatus()) && !row_exportedObj.getStatus().equalsIgnoreCase("pass")){
                     if(uncheckederrNo==0){
                         //create log sheet
+                        flagStr="fail";
+                        logger.error(logPrefix+" Verify contains unchecked failed rules, check log sheet");
                         log_expected = wb_expected.createSheet(ewTestLog);
                         row_expected=log_expected.createRow(uncheckederrNo);
                         //set head row
@@ -242,18 +243,20 @@ public class ValidationRuleUtil {
                     row_expected.createCell(5).setCellValue(row_exportedObj.getExtendGridId());//RowID
                     row_expected.createCell(6).setCellValue(row_exportedObj.getStatus());//Expected Status
                     row_expected.createCell(8).setCellValue(row_exportedObj.getMessage());//Expected Error
-                    logStatusSet.add(row_exportedObj.getStatus());
+
                     //add flag at column U for checked row
                     addCheckStatus(list_exported, row_exportedObj);
 
                 }
             }
-            if(logStatusSet.size()==1 && logStatusSet.contains("Ignored")){
-                flagStr="pass";
+           /* if(logStatusSet.size()==1 && logStatusSet.contains("Ignored")){
+                if(flagStr.equalsIgnoreCase("pass")){
+                    flagStr="pass:contains Ignored rules, check log sheet";
+                    logger.warn(logPrefix+" Verify contains unchecked failed rules, check log sheet");
+                }
             }else{
                 flagStr="fail";
-                logger.error(logPrefix+" Verify contains unchecked failed rules, check log sheet");
-            }
+            }*/
         }
         return flagStr;
     }
