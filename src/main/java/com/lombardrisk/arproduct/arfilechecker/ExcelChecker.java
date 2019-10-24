@@ -71,15 +71,25 @@ public class ExcelChecker  implements IFuncChecker{
 			logger.info("cellInfo are saved in "+csvFullName);
 			CsvDBUtil csvUtil=new CsvDBUtil(csvFullName);
 			//logger.info(csvUtil.printDuplicatedCells());
-			String log=csvUtil.printDuplicatedCells();
-			if(StringUtils.isBlank(log)){logger.info(log);}
-			String status=ExcelUtil.writeExport2ExcelResult(formInfo,expectedExcelFullName,null,exportedExcelFullName,csvUtil);
-			setExecutionStatus(status+System.getProperty("line.separator")+log);
-			if(status.startsWith("pass")){
-				flag=true;
-			}else{
+			if(csvUtil.connect()){
+				String log=csvUtil.printDuplicatedCells();
+
+				String status=ExcelUtil.writeExport2ExcelResult(formInfo,expectedExcelFullName,null,exportedExcelFullName,csvUtil);
+				if(StringUtils.isNotBlank(log)){
+					setExecutionStatus(status+System.getProperty("line.separator")+log);
+				}else {
+					setExecutionStatus(status);
+				}
+				if(status.startsWith("pass")){
+					flag=true;
+				}else{
+					flag=false;
+				}
+				csvUtil.close();
+			}else {
 				flag=false;
 			}
+
 		}else{
 			setExecutionStatus("fail on getNameInfo to csv");
 		}
