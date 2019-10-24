@@ -207,7 +207,7 @@ public class DBHelper {
 	{
 		if (getConn() == null)
 			return null;
-		logger.debug("Sql Statement: [" + sql + "]");
+		//logger.debug("Sql Statement: [" + sql + "]");
 		ArrayList<String> rst =null;
 		try
 		{
@@ -253,7 +253,7 @@ public class DBHelper {
 	{
 		if (getConn() == null)
 			return null;
-		logger.debug("Sql Statement: [" + sql + "]");
+		//logger.debug("Sql Statement: [" + sql + "]");
 		List<List<String>> rst =null;
 		try
 		{
