@@ -18,6 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class ValidationRuleUtil {
     private final static Logger logger = LoggerFactory.getLogger(ValidationRuleUtil.class);
@@ -169,7 +171,7 @@ public class ValidationRuleUtil {
 
             }
 
-            flagStr=writeExpectedLogSheet(wb_expected,ewTestLog,list_exported,objs_exported, comparedRowCount,flagStr);
+            flagStr=writeExpectedLogSheet(wb_expected,ewTestLog,list_exported,objs_exported, comparedRowCount,logPrefix,flagStr);
             //saved excels
             ExcelUtil.saveWorkbook(file_expected, wb_expected);
             String name=Helper.getFileNameWithoutSuffix(fileFullName_exported);
@@ -206,7 +208,7 @@ public class ValidationRuleUtil {
         return search;
     }
 
-    protected static String writeExpectedLogSheet(final Workbook wb_expected,final String ewTestLog,final List<List<String>> list_exported,final List<ExportToVal> objs_exported,final int comparedRowCount,String flagStr){
+    protected static String writeExpectedLogSheet(final Workbook wb_expected,final String ewTestLog,final List<List<String>> list_exported,final List<ExportToVal> objs_exported,final int comparedRowCount,final String logPrefix,String flagStr){
 
         Row row_expected=null;
         List<String> row_exported;
@@ -222,6 +224,7 @@ public class ValidationRuleUtil {
                     if(uncheckederrNo==0){
                         //create log sheet
                         flagStr="fail";
+                        logger.error(logPrefix+" Verify contains unchecked failed rules, check log sheet");
                         log_expected = wb_expected.createSheet(ewTestLog);
                         row_expected=log_expected.createRow(uncheckederrNo);
                         //set head row
@@ -246,6 +249,14 @@ public class ValidationRuleUtil {
 
                 }
             }
+           /* if(logStatusSet.size()==1 && logStatusSet.contains("Ignored")){
+                if(flagStr.equalsIgnoreCase("pass")){
+                    flagStr="pass:contains Ignored rules, check log sheet";
+                    logger.warn(logPrefix+" Verify contains unchecked failed rules, check log sheet");
+                }
+            }else{
+                flagStr="fail";
+            }*/
         }
         return flagStr;
     }
