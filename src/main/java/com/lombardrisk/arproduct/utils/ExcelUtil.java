@@ -198,9 +198,8 @@ public class ExcelUtil {
 			for(Expected4ExportToExcel expected_obj:it){
 				//part1 set expected info
 				//clear setting
-				expected_obj.setNotes(null);
-				expected_obj.setAcctualValue(null);
-				expected_obj.setTestResult(null);
+				expected_obj.clearExistedResult();
+
 				cellName_expected=expected_obj.getCellName();//column A
 				cellName_expected=cellName_expected.replaceAll("^_{1,}(.*)", "$1");
 				rowIdStr_expected=expected_obj.getRowID();
