@@ -99,7 +99,20 @@ public class Expected4ExportToExcel {
 		return notes;
 	}
 	public void setNotes(String notes) {
-		this.notes = notes;
+		if(StringUtils.isNotBlank(notes)){
+			if(StringUtils.isBlank(this.notes)){
+				this.notes=notes;
+			}else{
+				this.notes = this.notes.concat(notes);
+			}
+
+		}
+	}
+
+	public void clearExistedResult(){
+		this.notes=null;
+		this.acctualValue = null;
+		this.testResult = null;
 	}
 	
 }

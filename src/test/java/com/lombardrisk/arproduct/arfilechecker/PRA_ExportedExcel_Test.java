@@ -37,7 +37,7 @@ public class PRA_ExportedExcel_Test
      * Rigourous Test :-)
      * @throws Exception 
      */
-    public void testPRA() throws Exception
+    /*public void testPRA() throws Exception
     {
     	System.out.println("love");
     	String downloadFile=downPath+"PRA_3000_RFB008_v1_20190930.xlsx";     
@@ -47,6 +47,16 @@ public class PRA_ExportedExcel_Test
     	ExcelChecker achecker=new ExcelChecker( downloadFile, expectation);
     	Boolean flag=achecker.checker(downloadFile, expectation);
     	assertTrue( flag );
+    }*/
+    public void testPRA1() throws Exception
+    {
+        System.out.println("love");
+        String downloadFile=downPath+"PRA_3111_PRA110_v1_20191231_Validation(1).xlsx";
+        String expectation=expectedPath+"PRA110_V1_Rules(2).xlsx";
+
+        String log="";
+        ExcelChecker achecker=new ExcelChecker( downloadFile, expectation);
+        Boolean flag=achecker.checker(downloadFile, expectation);
+        assertTrue( flag );
     }
-    
 }
