@@ -348,9 +348,11 @@ public class ExcelUtil {
 	protected static String getCellValue_expected(Row row,int colIndex){
 		String cellValue="";
 		Cell cell=null;
-		cell=row.getCell(colIndex);
-		if(cell!=null){
-			cellValue=getDisplayCellValue(cell);
+		if(row!=null){
+			cell=row.getCell(colIndex);
+			if(cell!=null){
+				cellValue=getDisplayCellValue(cell);
+			}
 		}
 		return cellValue;
 	}
