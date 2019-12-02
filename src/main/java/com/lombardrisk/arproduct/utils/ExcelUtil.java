@@ -8,12 +8,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,14 +25,13 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.AreaReference;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.lombardrisk.arproduct.poi.ExcelXlsxReader;
+
 import com.lombardrisk.arproduct.pojo.Expected4ExportToExcel;
 
 
@@ -48,7 +42,16 @@ import com.lombardrisk.arproduct.pojo.Expected4ExportToExcel;
  */
 public class ExcelUtil {
 	private final static Logger logger = LoggerFactory.getLogger(ExcelUtil.class);
-
+	private final static List<String> FormatStrList= Arrays.asList("#,##0",
+			"#,##0.00",
+			"#,##0_);(#,##0)",
+			"#,##0_);[Red](#,##0)",
+			"#,##0.00_);(#,##0.00)",
+			"#,##0.00_);[Red](#,##0.00)",
+			"$#,##0_);($#,##0)",
+			"$#,##0_);[Red]($#,##0)",
+			"$#,##0.00_);($#,##0.00)",
+			"$#,##0.00_);[Red]($#,##0.00)");
 	/**
 	 * get last row number(0-base index), ignore last empty rows.
 	 * @param workBook
@@ -468,7 +471,7 @@ public class ExcelUtil {
 		    			displayValue = formatter.formatRawCellContents(numericCellVal,dataIndex,dataFormatStr).trim();
 		    		}
 				}else {
-					if (dataFormatStr.contains("#,##0_)")) {
+					if (dataFormatStr.contains("#,##0_)") && !FormatStrList.contains(dataFormatStr)) {
 						displayValue =
 								formatter.formatRawCellContents(numericCellVal, dataIndex, "#,##0;-#,##0").trim();
 					} else if (dataFormatStr.contains("\"%\"")) {
