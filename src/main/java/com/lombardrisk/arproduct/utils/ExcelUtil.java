@@ -457,10 +457,10 @@ public class ExcelUtil {
 		String displayValue=null;
 		if(cell==null){return null;}
 		DataFormatter formatter=new DataFormatter();
+		String dataFormatStr=cell.getCellStyle().getDataFormatString();
+		short dataIndex=cell.getCellStyle().getDataFormat();
 		switch(cell.getCellType()){
 			case Cell.CELL_TYPE_NUMERIC:
-				String dataFormatStr=cell.getCellStyle().getDataFormatString();
-				short dataIndex=cell.getCellStyle().getDataFormat();
 				double numericCellVal=cell.getNumericCellValue();
 				if (DateUtil.isCellDateFormatted(cell))
 				{
@@ -486,6 +486,10 @@ public class ExcelUtil {
 				break;
 			case Cell.CELL_TYPE_STRING:
 				displayValue = cell.getStringCellValue().trim();
+				if(displayValue.matches("[1-9]\\d*\\.\\d+") && dataIndex==0){
+				    //ARPA301
+					displayValue = formatter.formatRawCellContents(Double.valueOf(displayValue),dataIndex,dataFormatStr).trim();
+				}
 				break;
 			case Cell.CELL_TYPE_BOOLEAN:
 				displayValue = String.valueOf(cell.getBooleanCellValue());
